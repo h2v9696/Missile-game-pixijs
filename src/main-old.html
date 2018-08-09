@@ -1,0 +1,366 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Missile game</title>
+  <script src="gown/docs/lib/pixi/pixi.js"></script>
+  <script src="tink.js"></script>
+  <script src="gown/docs/dist/gown.js"></script>
+</head>
+
+<body>
+  <script>
+    //Set up Pixi and load the texture atlas files - call the `setup`
+    //function when they've loaded
+    let app = new PIXI.Application(400, 600, {backgroundColor : 0x3FA000});
+    document.body.appendChild(app.view);
+    let tink = new Tink(PIXI, app.view);
+    //Alias name
+    let Loader = PIXI.loader;
+    let Sprite = PIXI.Sprite;
+    let Texture = PIXI.Texture;
+    let TilingSprite = PIXI.extras.TilingSprite;
+    let TextureCache = PIXI.utils.TextureCache;
+    let Rectangle = PIXI.Rectangle;
+    let Text = PIXI.Text;
+    //Game variable
+    let state;
+    let pointer;
+    let background;
+    let enemies = new PIXI.Container();
+    let timeWaitSpawnEnemy = 120; //About 1/60s so 120 = 2s
+    let addPosision = 2;
+    let scaleTimes = 2;
+    let timeWaitTap = 300; //About 1/60s so 120 = 2s
+    let countTap = 0;
+    let coin = 10;
+    let textHandler;
+    let spawnHandler;
+    let text = new Text("Tap to start!", {fontSize: 50});
+    let coinText = new Text("", {fontSize: 30});
+    let message;
+    let scorePerEnemy = 10;
+    let explosionTexture;
+    let group, scroll_group;
+    let rectangle = new PIXI.Graphics();
+    let scrollWidth = app.view.width;
+    let scrollHeight = 100;
+    let isLoading = true;
+    let currentMissile;
+    let missile = {
+      damage: 1,
+      kind: "bam",
+      renderSprite: function(parent, missile) {
+        let m = new Sprite(
+          frame("../images/tankes.png", 128, 64, 32, 32)
+        );
+        m.interactive = true;
+        //m = new GOWN.Button();
+        m.height = scroll_group.height;
+        m.width = 100;
+        m.on("click", function(e){
+          console.log("Damage = " + missile.damage);
+          currentMissile = missile;
+          m.texture = explosionTexture;
+        });
+        parent.addChild(m);
+      }
+    };
+    //Load texture
+    Loader
+            .add("../images/bg.jpg")
+            .add("../images/monster.png")
+            .add("../images/tankes.png")
+            .load(setup);
+
+    //Declare any variables used in more than one function
+    function setup() {
+      //Initialize the game sprites, set the game `state` to `play`
+      //and start the 'gameLoop'
+      var theme = new GOWN.ThemeParser("gown/docs/themes/assets/aeon_desktop/aeon_desktop.json");
+      theme.once(GOWN.Theme.COMPLETE, onComplete, this);
+      GOWN.loader.load();
+      // Create and Set bg
+      background = new TilingSprite(PIXI.loader.resources["../images/bg.jpg"].texture, app.view.width, app.view.height);
+      app.stage.addChild(background);
+      background.x = 0;
+      background.y = 0;
+      //Add enemies
+      app.stage.addChild(enemies);
+      //Set text
+      text.x = app.view.width / 2 - text.width / 2;
+      text.y = app.view.height / 2 - text.height / 2;
+      coinText.x = 5;
+      coinText.y = 0;
+      coinText.text = "Coin: " + coin;
+      app.stage.addChild(text);
+      app.stage.addChild(coinText);
+
+      //Spawn enemy
+      //Set pointer
+      pointer = tink.makePointer();
+      //set the game state to `play`
+      state = main;
+      text.visible = true;
+      textEffect(text, 30);
+      explosionTexture = frame("../images/tankes.png", 96, 64 ,32, 32);
+      //Setup scroll
+      rectangle.beginFill(0xffffff);
+      rectangle.lineStyle(4, 0x000000, 1);
+      rectangle.drawRect(0, 0, scrollWidth - 4, scrollHeight);
+      rectangle.x = 2;
+      rectangle.y = app.view.height - 100;
+      rectangle.interactive = true;
+      rectangle.endFill();
+      rectangle.visible = false;
+      app.stage.addChild(rectangle);
+      //Load theme gown
+      //Start the game loop
+
+      gameLoop();
+    }
+
+    function gameLoop() {
+      //Runs the current game `state` in a loop and render the sprites
+      requestAnimationFrame(gameLoop);
+      tink.update();
+      state();
+    }
+
+    function main() {
+      coinText.visible = false;
+      if (!isLoading) {
+        text.text = "Tap to start!";
+        pointer.tap = () => {
+
+            rectangle.visible = true;
+            app.ticker.remove(textHandler);
+            text.visible = false;
+            coinText.visible = true;
+            executeWithTime(createEnemies, timeWaitSpawnEnemy);
+            scroll_group.visible = true;
+            state = play;
+            pointer.tap = null;
+        }
+      } else text.text = "Loading...";
+    }
+    function play() {
+      //All the game logic goes here
+      background.tilePosition.y += addPosision;
+      //Move all enemy in enemies forward with bg
+      enemies.children.some(enemy => {
+        enemy.y += addPosision; //Add equal to background so it's move along with bg
+
+        //Destroy enemy when out of screen
+        if (enemy.y > app.view.height - scrollHeight) {
+          enemies.removeChild(enemy);
+        }
+      });
+      coinText.text = "Coin: " + coin;
+      //Spawn Enemy
+    }
+
+    function end() {
+      //All the code that should run at the end of the game goes here
+    }
+    //The game's helper functions:
+    //`keyboard`, `hitTestRectangle`, `contain` and `randomInt`
+
+    //Game func
+    //Complete load gown theme and gen UI
+    function onComplete() {
+      group = new GOWN.LayoutGroup();
+      group.layout = new GOWN.layout.HorizontalLayout();
+      scroll_group = new GOWN.ScrollContainer();
+      scroll_group.x = 10;
+      scroll_group.y = app.view.height - 95;
+      scroll_group._useMask = false;
+      scroll_group.height = scrollHeight - 10;
+      scroll_group.width = scrollWidth - 20;
+      // create layout container and add some buttons
+      for (var i = 0; i < 10; i++) {
+          let m = Object.create(missile);
+          m.kind = "bam" + i;
+          m.damage = i + 1;
+          m.renderSprite(group, m);
+          console.log(m);
+          if (i < 10 - 1)
+            group.addSpacer(10);
+      }
+      scroll_group.viewPort = group;
+      scroll_group.visible = false;
+      app.stage.addChild(scroll_group);
+      isLoading = false;
+    }
+
+    function createEnemies() {
+      // let enemy = new Sprite(Loader.resources["../images/monster.png"].texture);
+      let enemy = new Sprite(
+        frame("../images/tankes.png", 32, 0 ,32, 32)
+      );
+
+      //Set random position in horizon
+      enemy.x = Math.floor((Math.random()*336));
+      enemy.y = -64;
+      //Set scale enemy (will hange later)
+      enemy.scale.x = scaleTimes;
+      enemy.scale.y = scaleTimes;
+      enemy.score = scorePerEnemy;
+      //Circle collider
+      // enemy.circular = true;
+      enemy.interactive = true;
+      enemy.on("click", function(e){
+        enemy.removeAllListeners();
+        //Stop scroll
+        text.text = "Fire!!!!"
+        text.visible = true;
+        state = pause;
+        wait(500).then(() => {
+          text.visible = false;
+          if (enemy.texture != explosionTexture) {
+            coin += enemy.score;
+            // console.log("Plz");
+            enemy.texture = explosionTexture;
+          }
+          executeWithTime(createEnemies, timeWaitSpawnEnemy);
+
+          state = play;
+        });
+      })
+      enemies.addChild(enemy);
+    }
+
+    function pause() {
+        app.ticker.remove(spawnHandler);
+    }
+
+    function doubleTap() {
+      let countTimeWaitTap = timeWaitTap;
+      app.ticker.add(function(delta) {
+        pointer.tap = () => {
+          console.log("Do it!");
+          countTap++;}
+        //console.log("Count: " + countTap + ", wait < 0: " + countTimeWaitTap);
+        //Countdown time to spawn
+
+        if (countTap === 1) {
+          countTimeWaitTap -= delta;
+        }
+        if (countTap === 2 && countTimeWaitTap >= 0) {
+          console.log("Double tapped enemy");
+          countTap = 0;
+          countTimeWaitTap = timeWaitTap;
+        }
+        if (countTimeWaitTap < 0) {
+          //Reset
+          countTap = 0;
+          countTimeWaitTap = timeWaitTap;
+        }
+      });
+    }
+    //Execute a function in a short of time and loop with update
+    function executeWithTime(func, time) {
+      let countTime = time;
+      app.ticker.add(spawnHandler = function(delta) {
+        //Countdown time to spawn
+        if (countTime < 0) {
+          func();
+          countTime = time;
+        } else {
+          //delta is time value from last frame to this frame
+          countTime -= delta;
+        }
+      });
+    }
+    //Start text effect
+    function textEffect(text, time) {
+      let countTime = time;
+      app.ticker.add(textHandler = function(delta) {
+        //Countdown time to spawn
+        if (countTime < 0) {
+          text.visible = false;
+          wait(250).then(() => countTime = time);
+        } else {
+          //delta is time value from last frame to this frame
+          countTime -= delta;
+          text.visible = true;
+        }
+      });
+    }
+    //Helper func
+    function frame(source, x, y, width, height) {
+      let texture, imageFrame;
+      //If the source is a string, it's either a texture in the
+      //cache or an image file
+      if (typeof source === "string") {
+        if (TextureCache[source]) {
+          texture = new Texture(TextureCache[source]);
+        }
+      } //If the `source` is a texture, use it
+      else if (source instanceof Texture) {
+        texture = new Texture(source);
+      }
+      if(!texture) {
+        console.log(`Please load the ${source} texture into the cache.`);
+      } else {
+      //Make a rectangle the size of the sub-image
+        imageFrame = new Rectangle(x, y, width, height);
+        texture.frame = imageFrame;
+        return texture;
+      }
+    }
+
+    function wait(duration = 0) {
+      return new Promise((resolve, reject) => {
+      setTimeout(resolve, duration);
+      });
+    }
+
+    function linkFont(source) {
+       //Use the font's filename as the `fontFamily` name. This code captures
+       //the font file's name without the extension or file path
+       let fontFamily = source.split("/").pop().split(".")[0];
+       //Append an `@afont-face` style rule to the head of the HTML document
+       let newStyle = document.createElement("style");
+       let fontFace
+       = "@font-face {font-family: '" + fontFamily
+       + "'; src: url('" + source + "');}";
+       newStyle.appendChild(document.createTextNode(fontFace));
+       document.head.appendChild(newStyle);
+    }
+
+    function contain(sprite, container) {
+      //Create a `Set` called `collision` to keep track of the
+      //boundaries with which the sprite is colliding
+      var collision = new Set();
+      //Left
+      //If the sprite's x position is less than the container's x position,
+      //move it back inside the container and add "left" to the collision Set
+      if (sprite.x < container.x) {
+        sprite.x = container.x;
+        collision.add("left");
+      }
+      //Top
+      if (sprite.y < container.y) {
+        sprite.y = container.y;
+        collision.add("top");
+      }
+      //Right
+      if (sprite.x + sprite.width > container.width) {
+        sprite.x = container.width - sprite.width;
+        collision.add("right");
+        }
+      //Bottom
+      if (sprite.y + sprite.height > container.height) {
+        sprite.y = container.height - sprite.height;
+        collision.add("bottom");
+      }
+      //If there were no collisions, set `collision` to `undefined`
+      if (collision.size === 0) collision = undefined;
+      //Return the `collision` value
+      return collision;
+    }
+
+  </script>
+</body>
+</html>
