@@ -25,6 +25,7 @@
     let Text = PIXI.Text;
     let Container = PIXI.Container;
     let Graphics = PIXI.Graphics;
+    let AnimatedSprite = PIXI.extras.AnimatedSprite;
     //Game variable
     let state;
     let pointer;
@@ -51,7 +52,9 @@
     let scrollHeight = 100;
     let isLoading = true;
     let currentMissile;
+    let explosionTextures;
     let missile = {
+      mId: 0,
       damage: 1,
       kind: "bam",
       isLocked: false,
@@ -67,16 +70,16 @@
           frame("../images/tankes.png", 224, 64, 32, 32)
         );
         let coinPerShootText = new Text(missile.coinPerShoot + "C", {fontSize: 20, align: "center"});
-        let damageText = new Text(missile.damage + "D", {fontSize: 20, align: "center"});
+        let damageText = new Text(missile.damage + "P", {fontSize: 20, align: "center"});
 
-        missile.missileText = new Text("Need: " + missile.coinNeededToUnlock, {fontSize: 20, fill: "white", align: "center"});
+        missile.missileText = new Text("Need: " + missile.coinNeededToUnlock + "C", {fontSize: 20, fill: "white", align: "center"});
         coinPerShootText.visible = false;
         damageText.visible = false;
         if (!missile.isLocked) {
           locker.visible = false;
 
         }
-        if (currentMissile.damage === missile.damage) {
+        if (currentMissile.mId === missile.mId) {
           missile.missileText.visible = true;
           coinPerShootText.visible = true;
           damageText.visible = true;
@@ -125,6 +128,10 @@
             .add("../images/bg.jpg")
             .add("../images/monster.png")
             .add("../images/tankes.png")
+            .add("../images/explosion1.png")
+            .add("../images/explosion2.png")
+            .add("../images/explosion3.png")
+            .add("../images/missile.png")
             .load(setup);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //Declare any variables used in more than one function
@@ -132,10 +139,16 @@
       //Initialize the game sprites, set the game `state` to `play`
       //and start the 'gameLoop'
       // Create and Set bg
-      background = new TilingSprite(PIXI.loader.resources["../images/bg.jpg"].texture, app.view.width, app.view.height);
+      background = new TilingSprite(Loader.resources["../images/bg.jpg"].texture, app.view.width, app.view.height);
       app.stage.addChild(background);
       background.x = 0;
       background.y = 0;
+      //Create explosion animation
+      explosionTextures = [
+        Loader.resources["../images/explosion1.png"].texture,
+        Loader.resources["../images/explosion2.png"].texture,
+        Loader.resources["../images/explosion3.png"].texture,
+      ];
       //Add enemies
       app.stage.addChild(enemies);
       //Set text
@@ -238,6 +251,7 @@
       // create layout container and add some buttons
       for (var i = 0; i < 10; i++) {
           let m = Object.create(missile);
+          m.mId = i + 1;
           if (i !== 0) {
             m.kind = "bam" + i;
             m.damage = i + 1;
@@ -245,6 +259,7 @@
             m.coinNeededToUnlock = i * 10;
             m.coinPerShoot = i * 2;
           } else {
+            m.damage = 10;
             currentMissile = m;
           }
           m.renderSprite(group, m);
@@ -261,6 +276,15 @@
       let enemy = new Sprite(
         frame("../images/tankes.png", 32, 0 ,32, 32)
       );
+      //Set death animation
+      let explosionAnimation = new AnimatedSprite(explosionTextures);
+      explosionAnimation.animationSpeed = 0.2
+      explosionAnimation.width = 128;
+      explosionAnimation.height = 128;
+      explosionAnimation.loop = false;
+      explosionAnimation.visible = false;
+      explosionAnimation.pivot.x = 0.5;
+      explosionAnimation.pivot.y = 0.5;
 
       //Set random position in horizon
       enemy.x = Math.floor((Math.random()*336));
@@ -301,11 +325,17 @@
               text.visible = false;
               if (enemy.texture != explosionTexture) {
                 enemy.health -= currentMissile.damage;
+                //Enemy death
                 if (enemy.health <= 0 ) {
                   enemy.removeAllListeners();
                   coin += enemy.score;
-                  enemy.texture = explosionTexture;
+                  enemies.removeChild(enemy);
+                  explosionAnimation.position.set(enemy.x - enemy.width / 2, enemy.y - enemy.height / 2);
+                  enemies.addChild(explosionAnimation);
+                  explosionAnimation.visible = true;
+                  explosionAnimation.play();
                   enemy.health = 0;
+                  enemy.healthText.visible = false;
                 }
               }
               enemy.healthText.text = "Health: " + enemy.health;
