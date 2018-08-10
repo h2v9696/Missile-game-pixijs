@@ -23,11 +23,13 @@
     let TextureCache = PIXI.utils.TextureCache;
     let Rectangle = PIXI.Rectangle;
     let Text = PIXI.Text;
+    let Container = PIXI.Container;
+    let Graphics = PIXI.Graphics;
     //Game variable
     let state;
     let pointer;
     let background;
-    let enemies = new PIXI.Container();
+    let enemies = new Container();
     let timeWaitSpawnEnemy = 120; //About 1/60s so 120 = 2s
     let addPosision = 2;
     let scaleTimes = 2;
@@ -35,15 +37,16 @@
     let countTap = 0;
     let coin = 10;
     let enemyMaxHealth = 5;
+    let coinPerEnemy = 10;
     let textHandler;
     let spawnHandler;
     let text = new Text("Tap to start!", {fontSize: 50, align: "center"});
+    let alertText = new Text("Not enough coin to unlock!", {fontSize: 20, fill: "red", align: "center"});
     let coinText = new Text("", {fontSize: 30});
     let message;
-    let scorePerEnemy = 10;
     let explosionTexture;
     let group, scroll_group;
-    let rectangle = new PIXI.Graphics();
+    let rectangle = new Graphics();
     let scrollWidth = app.view.width;
     let scrollHeight = 100;
     let isLoading = true;
@@ -51,19 +54,55 @@
     let missile = {
       damage: 1,
       kind: "bam",
+      isLocked: false,
+      coinNeededToUnlock: 0,
+      coinPerShoot: 1,
+      missileText: null,
       renderSprite: function(parent, missile) {
+        let mContainer = new Container();
         let m = new Sprite(
           frame("../images/tankes.png", 128, 64, 32, 32)
         );
+        let locker = new Sprite(
+          frame("../images/tankes.png", 224, 64, 32, 32)
+        );
+        missile.missileText = new Text("Need: " + missile.coinNeededToUnlock, {fontSize: 20, fill: "white", align: "center"});
+        if (!missile.isLocked) {
+          locker.visible = false;
+        }
+        if (currentMissile.damage === missile.damage) {
+          missile.missileText.visible = true;
+          missile.missileText.text = "Selected";
+        }
         m.interactive = true;
-        m.height = scroll_group.height;
+        missile.missileText.x = m.x;
+        missile.missileText.y = scroll_group.height - missile.missileText.height;
+        m.height = scroll_group.height - missile.missileText.height;
         m.width = 100;
         m.on("click", function(e){
-          console.log("Damage = " + missile.damage);
-          currentMissile = missile;
-          m.texture = explosionTexture;
+          if (currentMissile.damage === missile.damage) return;
+          if (missile.isLocked) {
+            if (missile.coinNeededToUnlock < coin) {
+              coin -= missile.coinNeededToUnlock;
+              missile.isLocked = false;
+              locker.visible = false;
+              missile.missileText.visible = false;
+            } else {
+              showAlert("Not enough coin to unlock!");
+            }
+          } else {
+            console.log("Damage = " + missile.damage);
+
+            currentMissile.missileText.visible = false;
+            currentMissile = missile;
+            currentMissile.missileText.visible = true;
+            currentMissile.missileText.text = "Selected";
+          }
         });
-        parent.addChild(m);
+        mContainer.addChild(m);
+        mContainer.addChild(locker);
+        mContainer.addChild(missile.missileText);
+        parent.addChild(mContainer);
       }
     };
     //Load texture
@@ -89,9 +128,12 @@
       text.y = app.view.height / 2 - text.height / 2;
       coinText.x = 5;
       coinText.y = 0;
+      alertText.x = app.view.width / 2 - alertText.width / 2;
+      alertText.y = 30;
       coinText.text = "Coin: " + coin;
       app.stage.addChild(text);
       app.stage.addChild(coinText);
+      app.stage.addChild(alertText);
       //Spawn enemy
       //Set pointer
       pointer = tink.makePointer();
@@ -99,6 +141,7 @@
       state = main;
       text.visible = true;
       textEffect(text, 30);
+      alertText.visible = false;
       explosionTexture = frame("../images/tankes.png", 96, 64 ,32, 32);
       //Setup scroll
       rectangle.beginFill(0x000000);
@@ -115,7 +158,6 @@
       theme.once(GOWN.Theme.COMPLETE, onComplete, this);
       GOWN.loader.load();
       //Current missile = default missile
-      currentMissile = missile;
       //Start the game loop
       gameLoop();
     }
@@ -155,10 +197,15 @@
         }
       });
       coinText.text = "Coin: " + coin;
+      if (coin === 0) {
+        state = end;
+      }
       //Spawn Enemy
     }
 
     function end() {
+      text.visible = true;
+      text.text = "Game Over!!"
       //All the code that should run at the end of the game goes here
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,8 +223,15 @@
       // create layout container and add some buttons
       for (var i = 0; i < 10; i++) {
           let m = Object.create(missile);
-          m.kind = "bam" + i;
-          m.damage = i + 1;
+          if (i !== 0) {
+            m.kind = "bam" + i;
+            m.damage = i + 1;
+            m.isLocked = true;
+            m.coinNeededToUnlock = i * 10;
+            m.coinPerShoot = i * 2;
+          } else {
+            currentMissile = m;
+          }
           m.renderSprite(group, m);
           if (i < 10 - 1)
             group.addSpacer(10);
@@ -199,7 +253,7 @@
       //Set scale enemy (will hange later)
       enemy.scale.x = scaleTimes;
       enemy.scale.y = scaleTimes;
-      enemy.score = scorePerEnemy;
+      enemy.score = coinPerEnemy;
       enemy.health = enemyMaxHealth;
       enemy.healthText = new Text("Health: " + enemy.health, {fontSize: 20, fill: "red", align: "center"});
       enemy.healthText.x = enemy.x - enemy.healthText.width / 2 + enemy.width / 2;
@@ -210,6 +264,7 @@
       enemy.countTap = 0;
       let timer = 0;
       let isClicked = false;
+      // enemy.on("tap", function(e){ // Mobile test
       enemy.on("click", function(e){
         //handle double click enemy
         if (!isClicked) {
@@ -222,29 +277,34 @@
         if (enemy.countTap === 2 && timer < timeWaitTap) {
           enemy.interactive = false;
           //Stop scroll
-          text.text = "Fire!!!!"
-          text.visible = true;
-          state = pause;
-          wait(500).then(() => {
-            text.visible = false;
-            if (enemy.texture != explosionTexture) {
-              enemy.health -= currentMissile.damage;
-              if (enemy.health <= 0 ) {
-                enemy.removeAllListeners();
-                coin += enemy.score;
-                enemy.texture = explosionTexture;
-                enemy.health = 0;
+          if (coin >= currentMissile.coinPerShoot) {
+            coin -= currentMissile.coinPerShoot;
+            text.text = "Fire!!!!"
+            text.visible = true;
+            state = pause;
+            wait(500).then(() => {
+              text.visible = false;
+              if (enemy.texture != explosionTexture) {
+                enemy.health -= currentMissile.damage;
+                if (enemy.health <= 0 ) {
+                  enemy.removeAllListeners();
+                  coin += enemy.score;
+                  enemy.texture = explosionTexture;
+                  enemy.health = 0;
+                }
               }
-            }
-            enemy.healthText.text = "Health: " + enemy.health;
-            app.ticker.speed = 1;
-            enemy.interactive = true;
-            state = play;
-          });
-          isClicked = false;
-          timer = 0;
-          app.ticker.remove(tapHandler);
-          enemy.countTap = 0;
+              enemy.healthText.text = "Health: " + enemy.health;
+              app.ticker.speed = 1;
+              enemy.interactive = true;
+              state = play;
+            });
+            isClicked = false;
+            timer = 0;
+            app.ticker.remove(tapHandler);
+            enemy.countTap = 0;
+          } else {
+            showAlert("Not enough coin to fire!");
+          }
         }
         if (timer >= timeWaitTap) {
           isClicked = false;
@@ -287,6 +347,14 @@
           countTime -= delta;
           text.visible = true;
         }
+      });
+    }
+    //Show alert
+    function showAlert(mess) {
+      alertText.visible = true;
+      alertText.text = mess;
+      wait(2000).then(() => {
+        alertText.visible = false;
       });
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
