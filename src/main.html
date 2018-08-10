@@ -31,7 +31,7 @@
     let timeWaitSpawnEnemy = 120; //About 1/60s so 120 = 2s
     let addPosision = 2;
     let scaleTimes = 2;
-    let timeWaitTap = 300; //About 1/60s so 120 = 2s
+    let timeWaitTap = 15;
     let countTap = 0;
     let coin = 10;
     let enemyMaxHealth = 5;
@@ -56,7 +56,6 @@
           frame("../images/tankes.png", 128, 64, 32, 32)
         );
         m.interactive = true;
-        //m = new GOWN.Button();
         m.height = scroll_group.height;
         m.width = 100;
         m.on("click", function(e){
@@ -73,7 +72,7 @@
             .add("../images/monster.png")
             .add("../images/tankes.png")
             .load(setup);
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //Declare any variables used in more than one function
     function setup() {
       //Initialize the game sprites, set the game `state` to `play`
@@ -102,7 +101,7 @@
       textEffect(text, 30);
       explosionTexture = frame("../images/tankes.png", 96, 64 ,32, 32);
       //Setup scroll
-      rectangle.beginFill(0xffffff);
+      rectangle.beginFill(0x000000);
       rectangle.lineStyle(4, 0x000000, 1);
       rectangle.drawRect(0, 0, scrollWidth - 4, scrollHeight);
       rectangle.x = 2;
@@ -126,7 +125,6 @@
       requestAnimationFrame(gameLoop);
       tink.update();
       state();
-      console.log(text.visible);
     }
 
     function main() {
@@ -138,7 +136,7 @@
             app.ticker.remove(textHandler);
             text.visible = false;
             coinText.visible = true;
-            executeWithTime(createEnemies, timeWaitSpawnEnemy);
+            spawnEnemies(timeWaitSpawnEnemy);
             scroll_group.visible = true;
             state = play;
             pointer.tap = null;
@@ -163,9 +161,7 @@
     function end() {
       //All the code that should run at the end of the game goes here
     }
-    //The game's helper functions:
-    //`keyboard`, `hitTestRectangle`, `contain` and `randomInt`
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //Game func
     //Complete load gown theme and gen UI
     function onComplete() {
@@ -183,7 +179,6 @@
           m.kind = "bam" + i;
           m.damage = i + 1;
           m.renderSprite(group, m);
-          // console.log(m);
           if (i < 10 - 1)
             group.addSpacer(10);
       }
@@ -194,7 +189,6 @@
     }
 
     function createEnemies() {
-      // let enemy = new Sprite(Loader.resources["../images/monster.png"].texture);
       let enemy = new Sprite(
         frame("../images/tankes.png", 32, 0 ,32, 32)
       );
@@ -213,68 +207,66 @@
       //Circle collider
       // enemy.circular = true;
       enemy.interactive = true;
+      enemy.countTap = 0;
+      let timer = 0;
+      let isClicked = false;
       enemy.on("click", function(e){
-        //Stop scroll
-        text.text = "Fire!!!!"
-        text.visible = true;
-        console.log(text.visible + text.text);
-        state = pause;
-        wait(500).then(() => {
-          text.visible = false;
-          if (enemy.texture != explosionTexture) {
-            enemy.health -= currentMissile.damage;
-            if (enemy.health <= 0 ) {
-              enemy.removeAllListeners();
-              coin += enemy.score;
-              // console.log("Plz");
-              enemy.texture = explosionTexture;
-              enemy.health = 0;
+        //handle double click enemy
+        if (!isClicked) {
+          app.ticker.add(tapHandler = function(delta) {
+            timer += delta;
+          });
+          isClicked = true;
+        }
+        enemy.countTap++;
+        if (enemy.countTap === 2 && timer < timeWaitTap) {
+          enemy.interactive = false;
+          //Stop scroll
+          text.text = "Fire!!!!"
+          text.visible = true;
+          state = pause;
+          wait(500).then(() => {
+            text.visible = false;
+            if (enemy.texture != explosionTexture) {
+              enemy.health -= currentMissile.damage;
+              if (enemy.health <= 0 ) {
+                enemy.removeAllListeners();
+                coin += enemy.score;
+                enemy.texture = explosionTexture;
+                enemy.health = 0;
+              }
             }
-          }
-          enemy.healthText.text = "Health: " + enemy.health;
-          app.ticker.start(spawnHandler);
-          state = play;
-        });
+            enemy.healthText.text = "Health: " + enemy.health;
+            app.ticker.speed = 1;
+            enemy.interactive = true;
+            state = play;
+          });
+          isClicked = false;
+          timer = 0;
+          app.ticker.remove(tapHandler);
+          enemy.countTap = 0;
+        }
+        if (timer >= timeWaitTap) {
+          isClicked = false;
+          timer = 0;
+          app.ticker.remove(tapHandler);
+          enemy.countTap = 0;
+        }
       })
       enemies.addChild(enemy);
       enemies.addChild(enemy.healthText);
     }
 
     function pause() {
-        app.ticker.stop(spawnHandler);
-    }
-
-    function doubleTap() {
-      let countTimeWaitTap = timeWaitTap;
-      app.ticker.add(function(delta) {
-        pointer.tap = () => {
-          console.log("Do it!");
-          countTap++;}
-        //console.log("Count: " + countTap + ", wait < 0: " + countTimeWaitTap);
-        //Countdown time to spawn
-
-        if (countTap === 1) {
-          countTimeWaitTap -= delta;
-        }
-        if (countTap === 2 && countTimeWaitTap >= 0) {
-          console.log("Double tapped enemy");
-          countTap = 0;
-          countTimeWaitTap = timeWaitTap;
-        }
-        if (countTimeWaitTap < 0) {
-          //Reset
-          countTap = 0;
-          countTimeWaitTap = timeWaitTap;
-        }
-      });
+        app.ticker.speed = 0;
     }
     //Execute a function in a short of time and loop with update
-    function executeWithTime(func, time) {
+    function spawnEnemies(time) {
       let countTime = time;
       app.ticker.add(spawnHandler = function(delta) {
         //Countdown time to spawn
         if (countTime < 0) {
-          func();
+          createEnemies();
           countTime = time;
         } else {
           //delta is time value from last frame to this frame
@@ -297,6 +289,7 @@
         }
       });
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //Helper func
     function frame(source, x, y, width, height) {
       let texture, imageFrame;
