@@ -66,12 +66,20 @@
         let locker = new Sprite(
           frame("../images/tankes.png", 224, 64, 32, 32)
         );
+        let coinPerShootText = new Text(missile.coinPerShoot + "C", {fontSize: 20, align: "center"});
+        let damageText = new Text(missile.damage + "D", {fontSize: 20, align: "center"});
+
         missile.missileText = new Text("Need: " + missile.coinNeededToUnlock, {fontSize: 20, fill: "white", align: "center"});
+        coinPerShootText.visible = false;
+        damageText.visible = false;
         if (!missile.isLocked) {
           locker.visible = false;
+
         }
         if (currentMissile.damage === missile.damage) {
           missile.missileText.visible = true;
+          coinPerShootText.visible = true;
+          damageText.visible = true;
           missile.missileText.text = "Selected";
         }
         m.interactive = true;
@@ -79,6 +87,10 @@
         missile.missileText.y = scroll_group.height - missile.missileText.height;
         m.height = scroll_group.height - missile.missileText.height;
         m.width = 100;
+        coinPerShootText.x = m.width - coinPerShootText.width;
+        damageText.x = m.width - damageText.width;
+        damageText.y = coinPerShootText.y + coinPerShootText.height;
+
         m.on("click", function(e){
           if (currentMissile.damage === missile.damage) return;
           if (missile.isLocked) {
@@ -86,13 +98,13 @@
               coin -= missile.coinNeededToUnlock;
               missile.isLocked = false;
               locker.visible = false;
+              coinPerShootText.visible = true;
+              damageText.visible = true;
               missile.missileText.visible = false;
             } else {
               showAlert("Not enough coin to unlock!");
             }
           } else {
-            console.log("Damage = " + missile.damage);
-
             currentMissile.missileText.visible = false;
             currentMissile = missile;
             currentMissile.missileText.visible = true;
@@ -101,7 +113,10 @@
         });
         mContainer.addChild(m);
         mContainer.addChild(locker);
+        mContainer.addChild(coinPerShootText);
+        mContainer.addChild(damageText);
         mContainer.addChild(missile.missileText);
+
         parent.addChild(mContainer);
       }
     };
