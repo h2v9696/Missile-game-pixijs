@@ -53,6 +53,9 @@
     let isLoading = true;
     let currentMissile;
     let explosionTextures;
+    let missileFly;
+    let missileHit;
+
     let missile = {
       mId: 0,
       damage: 1,
@@ -149,8 +152,22 @@
         Loader.resources["../images/explosion2.png"].texture,
         Loader.resources["../images/explosion3.png"].texture,
       ];
+
       //Add enemies
       app.stage.addChild(enemies);
+      //Create fly missile
+      missileFly = new Sprite(Loader.resources["../images/missile.png"].texture);
+      missileFly.y = app.view.height - 100;
+      missileFly.x = 0;
+      missileFly.width = 23.6;
+      missileFly.height = 192;
+      missileFly.visible = false;
+      missileHit = new Sprite(Loader.resources["../images/explosion1.png"].texture);
+      missileHit.width = 128;
+      missileHit.height = 128;
+      missileHit.visible = false;
+      app.stage.addChild(missileFly);
+      app.stage.addChild(missileHit);
       //Set text
       text.x = app.view.width / 2 - text.width / 2;
       text.y = app.view.height / 2 - text.height / 2;
@@ -315,33 +332,51 @@
         enemy.countTap++;
         if (enemy.countTap === 2 && timer < timeWaitTap) {
           enemy.interactive = false;
-          //Stop scroll
           if (coin >= currentMissile.coinPerShoot) {
             coin -= currentMissile.coinPerShoot;
-            text.text = "Fire!!!!"
-            text.visible = true;
+            //Stop scroll
             state = pause;
-            wait(500).then(() => {
-              text.visible = false;
-              if (enemy.texture != explosionTexture) {
-                enemy.health -= currentMissile.damage;
-                //Enemy death
-                if (enemy.health <= 0 ) {
-                  enemy.removeAllListeners();
-                  coin += enemy.score;
-                  enemies.removeChild(enemy);
-                  explosionAnimation.position.set(enemy.x - enemy.width / 2, enemy.y - enemy.height / 2);
-                  enemies.addChild(explosionAnimation);
-                  explosionAnimation.visible = true;
-                  explosionAnimation.play();
-                  enemy.health = 0;
-                  enemy.healthText.visible = false;
-                }
+
+            missileFly.visible = true;
+            //Random fire spot
+            let fireSpotX = getRandomInteger(enemy.x + missileFly.width / 2, enemy.x + enemy.width - missileFly.width / 2);
+
+
+            missileFly.x = fireSpotX;
+            app.ticker.add(missileFlyHandler = function(delta) {
+              let fireSpotY = getRandomInteger(enemy.y + 10, enemy.y + enemy.height - 10);
+              if (missileFly.y > fireSpotY)
+                missileFly.y -= addPosision * 4;
+              else {
+                app.ticker.remove(missileFlyHandler);
+                missileFly.visible = false;
+                missileHit.x = enemy.x - enemy.width / 2;
+                missileHit.y = enemy.y - enemy.height / 2;
+                missileFly.y = app.view.height - 100;
+                missileHit.visible = true;
+                wait(100).then(() => {
+                  missileHit.visible = false;
+                  if (enemy.texture != explosionTexture) {
+                    enemy.health -= currentMissile.damage;
+                    //Enemy death
+                    if (enemy.health <= 0 ) {
+                      enemy.removeAllListeners();
+                      coin += enemy.score;
+                      enemies.removeChild(enemy);
+                      explosionAnimation.position.set(enemy.x - enemy.width / 2, enemy.y - enemy.height / 2);
+                      enemies.addChild(explosionAnimation);
+                      explosionAnimation.visible = true;
+                      explosionAnimation.play();
+                      enemy.health = 0;
+                      enemy.healthText.visible = false;
+                    }
+                  }
+                  enemy.healthText.text = "Health: " + enemy.health;
+                  app.ticker.speed = 1;
+                  enemy.interactive = true;
+                  state = play;
+                });
               }
-              enemy.healthText.text = "Health: " + enemy.health;
-              app.ticker.speed = 1;
-              enemy.interactive = true;
-              state = play;
             });
             isClicked = false;
             timer = 0;
@@ -404,6 +439,10 @@
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //Helper func
+    function getRandomInteger(min, max) {
+      return Math.floor(Math.random() * (max - min) ) + min;
+    }
+
     function frame(source, x, y, width, height) {
       let texture, imageFrame;
       //If the source is a string, it's either a texture in the
