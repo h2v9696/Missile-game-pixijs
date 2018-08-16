@@ -276,7 +276,7 @@
             m.coinNeededToUnlock = i * 10;
             m.coinPerShoot = i * 2;
           } else {
-            m.damage = 10;
+            // m.damage = 10;
             currentMissile = m;
           }
           m.renderSprite(group, m);
@@ -336,12 +336,9 @@
             coin -= currentMissile.coinPerShoot;
             //Stop scroll
             state = pause;
-
             missileFly.visible = true;
             //Random fire spot
             let fireSpotX = getRandomInteger(enemy.x + missileFly.width / 2, enemy.x + enemy.width - missileFly.width / 2);
-
-
             missileFly.x = fireSpotX;
             app.ticker.add(missileFlyHandler = function(delta) {
               let fireSpotY = getRandomInteger(enemy.y + 10, enemy.y + enemy.height - 10);
@@ -515,7 +512,6 @@
       //Return the `collision` value
       return collision;
     }
-
   </script>
 </body>
 </html>
