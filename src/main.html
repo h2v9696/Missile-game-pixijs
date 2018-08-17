@@ -33,19 +33,18 @@
     let enemies = new Container();
     let timeWaitSpawnEnemy = 120; //About 1/60s so 120 = 2s
     let addPosision = 2;
-    let scaleTimes = 2;
+    let scaleTimes = 1;
     let timeWaitTap = 15;
     let countTap = 0;
-    let coin = 10;
+    let point = 1000;
     let enemyMaxHealth = 5;
     let coinPerEnemy = 10;
     let textHandler;
     let spawnHandler;
     let text = new Text("Tap to start!", {fontSize: 50, align: "center"});
-    let alertText = new Text("Not enough coin to unlock!", {fontSize: 20, fill: "red", align: "center"});
-    let coinText = new Text("", {fontSize: 30});
+    let alertText = new Text("Not enough point to unlock!", {fontSize: 20, fill: "red", align: "center"});
+    let coinText = new Text("", {fontSize: 20});
     let message;
-    let explosionTexture;
     let group, scroll_group;
     let rectangle = new Graphics();
     let scrollWidth = app.view.width;
@@ -55,14 +54,14 @@
     let explosionTextures;
     let missileFly;
     let missileHit;
-
+    let enemyTextures;
     let missile = {
       mId: 0,
       damage: 1,
       kind: "bam",
       isLocked: false,
-      coinNeededToUnlock: 0,
-      coinPerShoot: 1,
+      pointNeededToUnlock: 0,
+      pointPerShoot: 1,
       missileText: null,
       renderSprite: function(parent, missile) {
         let mContainer = new Container();
@@ -72,11 +71,11 @@
         let locker = new Sprite(
           frame("../images/tankes.png", 224, 64, 32, 32)
         );
-        let coinPerShootText = new Text(missile.coinPerShoot + "C", {fontSize: 20, align: "center"});
-        let damageText = new Text(missile.damage + "P", {fontSize: 20, align: "center"});
+        let pointPerShootText = new Text(missile.pointPerShoot + "P", {fontSize: 20, align: "center"});
+        let damageText = new Text(missile.damage + "D", {fontSize: 20, align: "center"});
 
-        missile.missileText = new Text("Need: " + missile.coinNeededToUnlock + "C", {fontSize: 20, fill: "white", align: "center"});
-        coinPerShootText.visible = false;
+        missile.missileText = new Text("" + missile.pointNeededToUnlock + "P", {fontSize: 20, fill: "white", align: "center"});
+        pointPerShootText.visible = false;
         damageText.visible = false;
         if (!missile.isLocked) {
           locker.visible = false;
@@ -84,31 +83,31 @@
         }
         if (currentMissile.mId === missile.mId) {
           missile.missileText.visible = true;
-          coinPerShootText.visible = true;
-          damageText.visible = true;
+          pointPerShootText.visible = true;
+          // damageText.visible = true;
           missile.missileText.text = "Selected";
         }
         m.interactive = true;
-        missile.missileText.x = m.x;
+        missile.missileText.x = m.x + m.width / 2;
         missile.missileText.y = scroll_group.height - missile.missileText.height;
         m.height = scroll_group.height - missile.missileText.height;
         m.width = 100;
-        coinPerShootText.x = m.width - coinPerShootText.width;
+        pointPerShootText.x = m.width - pointPerShootText.width;
         damageText.x = m.width - damageText.width;
-        damageText.y = coinPerShootText.y + coinPerShootText.height;
+        damageText.y = pointPerShootText.y + pointPerShootText.height;
 
         m.on("click", function(e){
           if (currentMissile.damage === missile.damage) return;
           if (missile.isLocked) {
-            if (missile.coinNeededToUnlock < coin) {
-              coin -= missile.coinNeededToUnlock;
+            if (missile.pointNeededToUnlock < point) {
+              point -= missile.pointNeededToUnlock;
               missile.isLocked = false;
               locker.visible = false;
-              coinPerShootText.visible = true;
-              damageText.visible = true;
+              pointPerShootText.visible = true;
+              // damageText.visible = true;
               missile.missileText.visible = false;
             } else {
-              showAlert("Not enough coin to unlock!");
+              showAlert("Not enough point to unlock!");
             }
           } else {
             currentMissile.missileText.visible = false;
@@ -119,7 +118,7 @@
         });
         mContainer.addChild(m);
         mContainer.addChild(locker);
-        mContainer.addChild(coinPerShootText);
+        mContainer.addChild(pointPerShootText);
         mContainer.addChild(damageText);
         mContainer.addChild(missile.missileText);
 
@@ -129,11 +128,14 @@
     //Load texture
     Loader
             .add("../images/bg.jpg")
-            .add("../images/monster.png")
             .add("../images/tankes.png")
             .add("../images/explosion1.png")
             .add("../images/explosion2.png")
             .add("../images/explosion3.png")
+            .add("../images/enemy1.png")
+            .add("../images/enemy2.png")
+            .add("../images/enemy3.png")
+            .add("../images/enemy4.png")
             .add("../images/missile.png")
             .load(setup);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +143,13 @@
     function setup() {
       //Initialize the game sprites, set the game `state` to `play`
       //and start the 'gameLoop'
+      //Enemies texture
+      enemyTextures = [
+        Loader.resources["../images/enemy1.png"].texture,
+        Loader.resources["../images/enemy2.png"].texture,
+        Loader.resources["../images/enemy3.png"].texture,
+        Loader.resources["../images/enemy4.png"].texture
+      ];
       // Create and Set bg
       background = new TilingSprite(Loader.resources["../images/bg.jpg"].texture, app.view.width, app.view.height);
       app.stage.addChild(background);
@@ -175,7 +184,7 @@
       coinText.y = 0;
       alertText.x = app.view.width / 2 - alertText.width / 2;
       alertText.y = 30;
-      coinText.text = "Coin: " + coin;
+      coinText.text = "Point: " + point;
       app.stage.addChild(text);
       app.stage.addChild(coinText);
       app.stage.addChild(alertText);
@@ -187,7 +196,6 @@
       text.visible = true;
       textEffect(text, 30);
       alertText.visible = false;
-      explosionTexture = frame("../images/tankes.png", 96, 64 ,32, 32);
       //Setup scroll
       rectangle.beginFill(0x000000);
       rectangle.lineStyle(4, 0x000000, 1);
@@ -241,8 +249,8 @@
           enemies.removeChild(enemy);
         }
       });
-      coinText.text = "Coin: " + coin;
-      if (coin === 0) {
+      coinText.text = "Point: " + point;
+      if (point === 0) {
         state = end;
       }
       //Spawn Enemy
@@ -273,8 +281,8 @@
             m.kind = "bam" + i;
             m.damage = i + 1;
             m.isLocked = true;
-            m.coinNeededToUnlock = i * 10;
-            m.coinPerShoot = i * 2;
+            m.pointNeededToUnlock = i * 500;
+            m.pointPerShoot = i * 20;
           } else {
             // m.damage = 10;
             currentMissile = m;
@@ -290,32 +298,23 @@
     }
 
     function createEnemies() {
-      let enemy = new Sprite(
-        frame("../images/tankes.png", 32, 0 ,32, 32)
-      );
-      //Set death animation
-      let explosionAnimation = new AnimatedSprite(explosionTextures);
-      explosionAnimation.animationSpeed = 0.2
-      explosionAnimation.width = 128;
-      explosionAnimation.height = 128;
-      explosionAnimation.loop = false;
-      explosionAnimation.visible = false;
-      explosionAnimation.pivot.x = 0.5;
-      explosionAnimation.pivot.y = 0.5;
+      let enemyTexture = enemyTextures[getRandomInteger(0, 4)];
+      let enemy = new Sprite(enemyTexture);
+
 
       //Set random position in horizon
-      enemy.x = Math.floor((Math.random()*336));
-      enemy.y = -64;
+      enemy.x = getRandomInteger(0, app.view.width - enemy.width);
+      enemy.y = - enemy.height * scaleTimes;
       //Set scale enemy (will hange later)
       enemy.scale.x = scaleTimes;
       enemy.scale.y = scaleTimes;
       enemy.score = coinPerEnemy;
-      enemy.health = enemyMaxHealth;
-      enemy.healthText = new Text("Health: " + enemy.health, {fontSize: 20, fill: "red", align: "center"});
-      enemy.healthText.x = enemy.x - enemy.healthText.width / 2 + enemy.width / 2;
-      enemy.healthText.y = enemy.y - enemy.healthText.height;
-      //Circle collider
-      // enemy.circular = true;
+      //Enemy Heath
+      // enemy.health = enemyMaxHealth;
+      // enemy.healthText = new Text("Health: " + enemy.health, {fontSize: 20, fill: "red", align: "center"});
+      // enemy.healthText.x = enemy.x - enemy.healthText.width / 2 + enemy.width / 2;
+      // enemy.healthText.y = enemy.y - enemy.healthText.height;
+
       enemy.interactive = true;
       enemy.countTap = 0;
       let timer = 0;
@@ -332,8 +331,8 @@
         enemy.countTap++;
         if (enemy.countTap === 2 && timer < timeWaitTap) {
           enemy.interactive = false;
-          if (coin >= currentMissile.coinPerShoot) {
-            coin -= currentMissile.coinPerShoot;
+          if (point >= currentMissile.pointPerShoot) {
+            point -= currentMissile.pointPerShoot;
             //Stop scroll
             state = pause;
             missileFly.visible = true;
@@ -346,29 +345,24 @@
                 missileFly.y -= addPosision * 4;
               else {
                 app.ticker.remove(missileFlyHandler);
+                missileHit.x = missileFly.x - missileHit.width / 2;
+                missileHit.y = missileFly.y - missileHit.height / 2;
                 missileFly.visible = false;
-                missileHit.x = enemy.x - enemy.width / 2;
-                missileHit.y = enemy.y - enemy.height / 2;
                 missileFly.y = app.view.height - 100;
+                // missileHit.x = enemy.x - enemy.width / 2;
+                // missileHit.y = enemy.y - enemy.height / 2;
+
                 missileHit.visible = true;
                 wait(100).then(() => {
                   missileHit.visible = false;
-                  if (enemy.texture != explosionTexture) {
-                    enemy.health -= currentMissile.damage;
-                    //Enemy death
-                    if (enemy.health <= 0 ) {
-                      enemy.removeAllListeners();
-                      coin += enemy.score;
-                      enemies.removeChild(enemy);
-                      explosionAnimation.position.set(enemy.x - enemy.width / 2, enemy.y - enemy.height / 2);
-                      enemies.addChild(explosionAnimation);
-                      explosionAnimation.visible = true;
-                      explosionAnimation.play();
-                      enemy.health = 0;
-                      enemy.healthText.visible = false;
-                    }
-                  }
-                  enemy.healthText.text = "Health: " + enemy.health;
+                  // enemy.health -= currentMissile.damage;
+                  //Enemy death
+                  // if (enemy.health <= 0 ) {
+                  //   enemyDeath(enemy);
+                  // }
+                  enemyDeath(enemy);
+
+                  // enemy.healthText.text = "Health: " + enemy.health;
                   app.ticker.speed = 1;
                   enemy.interactive = true;
                   state = play;
@@ -380,7 +374,7 @@
             app.ticker.remove(tapHandler);
             enemy.countTap = 0;
           } else {
-            showAlert("Not enough coin to fire!");
+            showAlert("Not enough point to fire!");
           }
         }
         if (timer >= timeWaitTap) {
@@ -391,7 +385,7 @@
         }
       })
       enemies.addChild(enemy);
-      enemies.addChild(enemy.healthText);
+      // enemies.addChild(enemy.healthText);
     }
 
     function pause() {
@@ -433,6 +427,30 @@
       wait(2000).then(() => {
         alertText.visible = false;
       });
+    }
+    //Enemy death handler
+    function enemyDeath(enemy) {
+      //Set death animation
+      let explosionAnimation = new AnimatedSprite(explosionTextures);
+      explosionAnimation.animationSpeed = 0.15
+      // explosionAnimation.width = 128;
+      // explosionAnimation.height = 128;
+      explosionAnimation.loop = false;
+      explosionAnimation.visible = false;
+      explosionAnimation.pivot.x = 0.5;
+      explosionAnimation.pivot.y = 0.5;
+      explosionAnimation.scale.x = 0.7;
+      explosionAnimation.scale.y = 0.7;
+
+      enemy.removeAllListeners();
+      point += enemy.score;
+      enemies.removeChild(enemy);
+      explosionAnimation.position.set(enemy.x, enemy.y);
+      enemies.addChild(explosionAnimation);
+      explosionAnimation.visible = true;
+      explosionAnimation.play();
+      enemy.health = 0;
+      // enemy.healthText.visible = false;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //Helper func
