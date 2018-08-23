@@ -1,4 +1,15 @@
-//Set up Pixi and load the texture atlas files - call the `setup`
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Missile game</title>
+    <script src="public/libs/gown/docs/lib/pixi/pixi.js"></script>
+    <script src="public/libs/tink.js"></script>
+    <script src="public/libs/gown/docs/dist/gown.js"></script>
+</head>
+<body>
+    <script>
+    //Set up Pixi and load the texture atlas files - call the `setup`
 //function when they've loaded
 let app = new PIXI.Application(400, 600, {backgroundColor : 0x3FA000});
 document.body.appendChild(app.view);
@@ -55,10 +66,10 @@ let missile = {
   renderMissile: function(parent, missile) {
     let mContainer = new Container();
     let m = new Sprite(
-      frame("/public/imgs/tankes.png", 128, 64, 32, 32)
+      frame("public/imgs/tankes.png", 128, 64, 32, 32)
     );
     let locker = new Sprite(
-      frame("/public/imgs/tankes.png", 224, 64, 32, 32)
+      frame("public/imgs/tankes.png", 224, 64, 32, 32)
     );
     let pointPerShootText = new Text(missile.pointPerShoot + "P", {fontSize: 20, align: "center"});
     let damageText = new Text(missile.damage + "D", {fontSize: 20, align: "center"});
@@ -273,16 +284,16 @@ let enemy = {
 };
 //Load texture
 Loader
-        .add("/public/imgs/bg.jpg")
-        .add("/public/imgs/tankes.png")
-        .add("/public/imgs/explosion1.png")
-        .add("/public/imgs/explosion2.png")
-        .add("/public/imgs/explosion3.png")
-        .add("/public/imgs/enemy1.png")
-        .add("/public/imgs/enemy2.png")
-        .add("/public/imgs/enemy3.png")
-        .add("/public/imgs/enemy4.png")
-        .add("/public/imgs/missile.png")
+        .add("public/imgs/bg.jpg")
+        .add("public/imgs/tankes.png")
+        .add("public/imgs/explosion1.png")
+        .add("public/imgs/explosion2.png")
+        .add("public/imgs/explosion3.png")
+        .add("public/imgs/enemy1.png")
+        .add("public/imgs/enemy2.png")
+        .add("public/imgs/enemy3.png")
+        .add("public/imgs/enemy4.png")
+        .add("public/imgs/missile.png")
         .load(setup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
@@ -291,33 +302,33 @@ function setup() {
   //and start the 'gameLoop'
   //Enemies texture
   enemyTextures = [
-    Loader.resources["/public/imgs/enemy1.png"].texture,
-    Loader.resources["/public/imgs/enemy2.png"].texture,
-    Loader.resources["/public/imgs/enemy3.png"].texture,
-    Loader.resources["/public/imgs/enemy4.png"].texture
+    Loader.resources["public/imgs/enemy1.png"].texture,
+    Loader.resources["public/imgs/enemy2.png"].texture,
+    Loader.resources["public/imgs/enemy3.png"].texture,
+    Loader.resources["public/imgs/enemy4.png"].texture
   ];
   // Create and Set bg
-  background = new TilingSprite(Loader.resources["/public/imgs/bg.jpg"].texture, app.view.width, app.view.height);
+  background = new TilingSprite(Loader.resources["public/imgs/bg.jpg"].texture, app.view.width, app.view.height);
   app.stage.addChild(background);
   background.x = 0;
   background.y = 0;
   //Create explosion animation
   explosionTextures = [
-    Loader.resources["/public/imgs/explosion1.png"].texture,
-    Loader.resources["/public/imgs/explosion2.png"].texture,
-    Loader.resources["/public/imgs/explosion3.png"].texture,
+    Loader.resources["public/imgs/explosion1.png"].texture,
+    Loader.resources["public/imgs/explosion2.png"].texture,
+    Loader.resources["public/imgs/explosion3.png"].texture,
   ];
 
   //Add enemies
   app.stage.addChild(enemies);
   //Create fly missile
-  missileFly = new Sprite(Loader.resources["/public/imgs/missile.png"].texture);
+  missileFly = new Sprite(Loader.resources["public/imgs/missile.png"].texture);
   missileFly.y = app.view.height - 100;
   missileFly.x = 0;
   missileFly.width = 23.6;
   missileFly.height = 192;
   missileFly.visible = false;
-  missileHit = new Sprite(Loader.resources["/public/imgs/explosion1.png"].texture);
+  missileHit = new Sprite(Loader.resources["public/imgs/explosion1.png"].texture);
   missileHit.width = 128;
   missileHit.height = 128;
   missileHit.visible = false;
@@ -353,7 +364,7 @@ function setup() {
   rectangle.visible = false;
   app.stage.addChild(rectangle);
   //Load theme gown
-  var theme = new GOWN.ThemeParser("/public/libs/gown/docs/themes/assets/aeon_desktop/aeon_desktop.json");
+  var theme = new GOWN.ThemeParser("public/libs/gown/docs/themes/assets/aeon_desktop/aeon_desktop.json");
   theme.once(GOWN.Theme.COMPLETE, onComplete, this);
   GOWN.loader.load();
   // pauseBtn = new GOWN.Button(theme);
@@ -530,22 +541,21 @@ function enemyDeath(enemy, perfectCircle, greatCircle, goodCircle) {
   let multipler = 1;
   let i = getRandomInteger(1,100);
   console.log(i);
+  if(i<90)
+  {
+    multipler = 2;
+    text.text = "Score x 2 !!"
+    text.visible = true;
+    wait(500).then(() => {text.visible = false;});
 
-  if(i<60)
-    {
-      multipler = 2;
-      text.text = "Score x 2 !!"
-      text.visible = true;
-      wait(500).then(() => {text.visible = false;});
-  
-      }
-    if(i<10)
-    {
-      multipler = 10;
-      text.text = "Score x 10 !!"
-      text.visible = true;
-      wait(500).then(() => {text.visible = false;});
     }
+  if(i<10)
+  {
+    multipler = 10;
+    text.text = "Score x 10 !!"
+    text.visible = true;
+    wait(500).then(() => {text.visible = false;});
+  }
   
   point += enemy.score*multipler;
 
@@ -643,4 +653,12 @@ function contain(sprite, container) {
   //Return the `collision` value
   return collision;
 }
+
+    
+        
+        
+        
+    </script>
+    
+</body>
 
