@@ -566,16 +566,15 @@ function enemyDeath(enemy/*, perfectCircle, greatCircle, goodCircle*/) {
   let multipler = 1;
   let i = getRandomInteger(1, 100);
   text.text = "+" + enemy.score;
-  if (i < 90)
-  {
-    multipler = 2;
-    text.text += "\nScore x 2!!"
-  }
-  if (i < 10)
+  if (i < 2)
   {
     multipler = 10;
-    text.text += "\nScore x 10!!"
+  } else if (i < 5)
+  {
+    multipler = 2;
   }
+  if (multipler > 1)
+    text.text += "\nScore x " + multipler + "!!";
   //Update text pos
   text.x = app.view.width / 2 - text.width / 2;
   text.y = app.view.height / 2 - text.height / 2;
