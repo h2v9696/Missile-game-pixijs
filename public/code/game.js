@@ -44,7 +44,7 @@ let message;
 let group, scroll_group;
 let rectangle = new Graphics();
 let scrollWidth = app.view.width;
-let scrollHeight = 100;
+let scrollHeight = 150;
 let isLoading = true;
 let currentMissile;
 let explosionTextures;
@@ -70,15 +70,16 @@ let missile = {
     let locker = new Sprite(
       frame("public/imgs/tankes.png", 224, 64, 32, 32)
     );
-    let pointPerShootText = new Text(missile.pointPerShoot + "P", {fontSize: 20, align: "center"});
-    let damageText = new Text(missile.damage + "D", {fontSize: 20, align: "center"});
+    let pointPerShootText = new Text(missile.pointPerShoot + "P", {fontSize: 30, align: "center"});
+    // let damageText = new Text(missile.damage + "D", {fontSize: 20, align: "center"});
 
-    missile.missileText = new Text("" + missile.pointNeededToUnlock + "P", {fontSize: 20, fill: "white", align: "center"});
+    missile.missileText = new Text("" + missile.pointNeededToUnlock + "P", {fontSize: 30, fill: "white"});
     pointPerShootText.visible = false;
-    damageText.visible = false;
+    // damageText.visible = false;
+    m.alpha = 0.5;
     if (!missile.isLocked) {
       locker.visible = false;
-
+      m.alpha = 1;
     }
     if (currentMissile.mId === missile.mId) {
       missile.missileText.visible = true;
@@ -87,13 +88,19 @@ let missile = {
       missile.missileText.text = "Selected";
     }
     m.interactive = true;
-    missile.missileText.x = m.x + m.width / 2;
-    missile.missileText.y = scroll_group.height - missile.missileText.height;
     m.height = scroll_group.height - missile.missileText.height;
-    m.width = 100;
-    pointPerShootText.x = m.width - pointPerShootText.width;
-    damageText.x = m.width - damageText.width;
-    damageText.y = pointPerShootText.y + pointPerShootText.height;
+    m.width = 150;
+    missile.missileText.x = m.x + m.width / 2 - missile.missileText.width / 2;
+    missile.missileText.y = scroll_group.height - missile.missileText.height;
+    locker.scale.x = 2;
+    locker.scale.y = 2;
+    locker.x = m.x + m.width / 2 - locker.width / 2;
+    locker.y = m.y + m.height / 2 - locker.height / 2;
+
+
+    pointPerShootText.x = m.x;
+    // damageText.x = m.width - damageText.width;
+    // damageText.y = pointPerShootText.y + pointPerShootText.height;
 
     m.on("pointertap", function(e){
       if (currentMissile.damage === missile.damage) return;
@@ -103,6 +110,7 @@ let missile = {
           coinText.text = "Point: " + point;
           missile.isLocked = false;
           locker.visible = false;
+          m.alpha = 1;
           pointPerShootText.visible = true;
           // damageText.visible = true;
           missile.missileText.visible = false;
@@ -112,14 +120,15 @@ let missile = {
       } else {
         currentMissile.missileText.visible = false;
         currentMissile = missile;
-        currentMissile.missileText.visible = true;
         currentMissile.missileText.text = "Selected";
+        missile.missileText.x = m.x + m.width / 2 - missile.missileText.width / 2;
+        currentMissile.missileText.visible = true;
       }
     });
     mContainer.addChild(m);
     mContainer.addChild(locker);
     mContainer.addChild(pointPerShootText);
-    mContainer.addChild(damageText);
+    // mContainer.addChild(damageText);
     mContainer.addChild(missile.missileText);
 
     parent.addChild(mContainer);
@@ -357,9 +366,9 @@ function setup() {
   //Setup scroll
   rectangle.beginFill(0x000000);
   rectangle.lineStyle(4, 0x000000, 1);
-  rectangle.drawRect(0, 0, scrollWidth - 4, scrollHeight);
+  rectangle.drawRect(0, 0, scrollWidth - 4, scrollHeight + 10);
   rectangle.x = 2;
-  rectangle.y = app.view.height - 100;
+  rectangle.y = app.view.height - scrollHeight - 10;
   rectangle.interactive = true;
   rectangle.endFill();
   rectangle.visible = false;
@@ -450,8 +459,11 @@ function play() {
 }
 
 function end() {
-  text.visible = true;
   text.text = "Game Over!!"
+  //Update text pos
+  text.x = app.view.width / 2 - text.width / 2;
+  text.y = app.view.height / 2 - text.height / 2;
+  text.visible = true;
   //All the code that should run at the end of the game goes here
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -462,7 +474,7 @@ function onComplete() {
   group.layout = new GOWN.layout.HorizontalLayout();
   scroll_group = new GOWN.ScrollContainer();
   scroll_group.x = 10;
-  scroll_group.y = app.view.height - 95;
+  scroll_group.y = app.view.height - scrollHeight;
   scroll_group._useMask = false;
   scroll_group.height = scrollHeight - 10;
   scroll_group.width = scrollWidth - 20;
@@ -525,8 +537,10 @@ function textEffect(text, time) {
 }
 //Show alert
 function showAlert(mess) {
-  alertText.visible = true;
   alertText.text = mess;
+  alertText.x = app.view.width / 2 - alertText.width / 2;
+  alertText.y = coinText.height + 5;
+  alertText.visible = true;
   wait(2000).then(() => {
     alertText.visible = false;
   });
@@ -551,20 +565,22 @@ function enemyDeath(enemy/*, perfectCircle, greatCircle, goodCircle*/) {
 
   let multipler = 1;
   let i = getRandomInteger(1, 100);
+  text.text = "+" + enemy.score;
   if (i < 90)
   {
     multipler = 2;
-    text.text = "Score x 2!!"
-    text.visible = true;
-    wait(500).then(() => {text.visible = false;});
+    text.text += "\nScore x 2!!"
   }
   if (i < 10)
   {
     multipler = 10;
-    text.text = "Score x 10!!"
-    text.visible = true;
-    wait(500).then(() => {text.visible = false;});
+    text.text += "\nScore x 10!!"
   }
+  //Update text pos
+  text.x = app.view.width / 2 - text.width / 2;
+  text.y = app.view.height / 2 - text.height / 2;
+  text.visible = true;
+  wait(500).then(() => {text.visible = false;});
 
   point += enemy.score * multipler;
   coinText.text = "Point: " + point;
