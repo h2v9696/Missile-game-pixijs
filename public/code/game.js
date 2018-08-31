@@ -553,7 +553,7 @@ function play() {
   enemies.children.some(enemy => {
     enemy.y += addPosision * DELTA_TIME; //Add equal to background so it's move along with bg
     //Destroy enemy when out of screen
-    if (enemy.y > app.view.height + 100) {
+    if (enemy.y > app.view.height + 300) {
       enemies.removeChild(enemy);
     }
   });
