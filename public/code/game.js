@@ -1,6 +1,7 @@
 //Set up Pixi and load the texture atlas files - call the `setup`
 //function when they've loaded
-let app = new PIXI.Application(400, 600, {backgroundColor : 0x3FA000});
+PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
+let app = new PIXI.Application(590, 960, {backgroundColor : 0x3FA000}, {legacy : true});
 document.body.appendChild(app.view);
 scaleToWindow(app.view);
 let tink = new Tink(PIXI, app.view);
@@ -16,6 +17,7 @@ let Container = PIXI.Container;
 let Graphics = PIXI.Graphics;
 let AnimatedSprite = PIXI.extras.AnimatedSprite;
 let InteractionManager = PIXI.interaction.InteractionManager;
+let TransparencyHitArea = PIXI.TransparencyHitArea;
 //Game variable
 let state;
 let pointer;
@@ -31,9 +33,13 @@ let enemyMaxHealth = 5;
 let coinPerEnemy = 10;
 let textHandler;
 let spawnHandler;
-let text = new Text("Tap to start!", {fontSize: 50, align: "center",wordWrap: true,wordWrapWidth: app.view.width});
-let alertText = new Text("Not enough point to unlock!", {fontSize: 20, fill: "red", align: "center"});
-let coinText = new Text("", {fontSize: 20});
+let text = new Text("Tap to start!", {
+  fontSize: 80, align: "center",
+  wordWrap: true, wordWrapWidth: app.view.width,
+  stroke: "white", strokeThickness: 4
+});
+let alertText = new Text("Not enough point to unlock!", {fontSize: 20, fill: "red", align: "center", stroke: "white", strokeThickness: 4});
+let coinText = new Text("", {fontSize: 40, stroke: "white", strokeThickness: 4});
 let message;
 let group, scroll_group;
 let rectangle = new Graphics();
@@ -45,6 +51,9 @@ let explosionTextures;
 let missileFly;
 let missileHit;
 let enemyTextures;
+let DELTA_TIME = 1;
+let lastTime = 0;
+
 let missile = {
   mId: 0,
   damage: 1,
@@ -56,10 +65,10 @@ let missile = {
   renderMissile: function(parent, missile) {
     let mContainer = new Container();
     let m = new Sprite(
-      frame("/public/imgs/tankes.png", 128, 64, 32, 32)
+      frame("public/imgs/tankes.png", 128, 64, 32, 32)
     );
     let locker = new Sprite(
-      frame("/public/imgs/tankes.png", 224, 64, 32, 32)
+      frame("public/imgs/tankes.png", 224, 64, 32, 32)
     );
     let pointPerShootText = new Text(missile.pointPerShoot + "P", {fontSize: 20, align: "center"});
     let damageText = new Text(missile.damage + "D", {fontSize: 20, align: "center"});
@@ -154,23 +163,23 @@ let enemy = {
     e.x = getRandomInteger(0, app.view.width - e.width);
     e.y = - e.height * scaleTimes;
     //Draw circle
-    let perfectCircle = new Graphics();
-    perfectCircle.beginFill(0xff0000);
-    perfectCircle.drawCircle(e.getGlobalPosition().x + enemy.perfectPos.x, e.getGlobalPosition().y + enemy.perfectPos.y, enemy.perfectPos.radius);
-    perfectCircle.alpha = 0.3;
-    perfectCircle.endFill();
+    // let perfectCircle = new Graphics();
+    // perfectCircle.beginFill(0xff0000);
+    // perfectCircle.drawCircle(e.getGlobalPosition().x + enemy.perfectPos.x, e.getGlobalPosition().y + enemy.perfectPos.y, enemy.perfectPos.radius);
+    // perfectCircle.alpha = 0.3;
+    // perfectCircle.endFill();
 
-    let greatCircle = new Graphics();
-    greatCircle.beginFill(0xa2ff00);
-    greatCircle.drawCircle(e.getGlobalPosition().x + enemy.greatPos.x, e.getGlobalPosition().y + enemy.greatPos.y, enemy.greatPos.radius);
-    greatCircle.alpha = 0.3;
-    greatCircle.endFill();
+    // let greatCircle = new Graphics();
+    // greatCircle.beginFill(0xa2ff00);
+    // greatCircle.drawCircle(e.getGlobalPosition().x + enemy.greatPos.x, e.getGlobalPosition().y + enemy.greatPos.y, enemy.greatPos.radius);
+    // greatCircle.alpha = 0.3;
+    // greatCircle.endFill();
 
-    let goodCircle = new Graphics();
-    goodCircle.beginFill(0x00c6ff);
-    goodCircle.drawCircle(e.getGlobalPosition().x + enemy.goodPos.x, e.getGlobalPosition().y + enemy.goodPos.y, enemy.goodPos.radius);
-    goodCircle.alpha = 0.3;
-    goodCircle.endFill();
+    // let goodCircle = new Graphics();
+    // goodCircle.beginFill(0x00c6ff);
+    // goodCircle.drawCircle(e.getGlobalPosition().x + enemy.goodPos.x, e.getGlobalPosition().y + enemy.goodPos.y, enemy.goodPos.radius);
+    // goodCircle.alpha = 0.3;
+    // goodCircle.endFill();
     //Set scale enemy (will hange later)
     e.scale.x = scaleTimes;
     e.scale.y = scaleTimes;
@@ -182,6 +191,7 @@ let enemy = {
     enemy.score = enemy.pointGoodHit;
 
     e.interactive = true;
+    e.hitArea = TransparencyHitArea.create(e);
     e.countTap = 0;
     let timer = 0;
     let isClicked = false;
@@ -223,7 +233,7 @@ let enemy = {
           app.ticker.add(missileFlyHandler = function(delta) {
             // let fireSpotY = getRandomInteger(e.y + 10, e.y + e.height - 10);
             if (missileFly.y > clickPosY)
-              missileFly.y -= addPosision * 4;
+              missileFly.y -= addPosision * 8 * DELTA_TIME;
             else {
               app.ticker.remove(missileFlyHandler);
               missileHit.x = missileFly.x - missileHit.width / 2;
@@ -241,8 +251,8 @@ let enemy = {
                 // if (enemy.health <= 0 ) {
                 //   enemyDeath(enemy);
                 // }
-                enemyDeath(enemy, perfectCircle, greatCircle, goodCircle);
-
+                // enemyDeath(enemy, perfectCircle, greatCircle, goodCircle);
+                enemyDeath(enemy);
                 // e.healthText.text = "Health: " + enemy.health;
                 app.ticker.speed = 1;
                 e.interactive = true;
@@ -266,24 +276,24 @@ let enemy = {
       }
     })
     parent.addChild(e);
-    parent.addChild(goodCircle);
-    parent.addChild(greatCircle);
-    parent.addChild(perfectCircle);
+    // parent.addChild(goodCircle);
+    // parent.addChild(greatCircle);
+    // parent.addChild(perfectCircle);
     // enemies.addChild(e.healthText);
   }
 };
 //Load texture
 Loader
-        .add("/public/imgs/bg.jpg")
-        .add("/public/imgs/tankes.png")
-        .add("/public/imgs/explosion1.png")
-        .add("/public/imgs/explosion2.png")
-        .add("/public/imgs/explosion3.png")
-        .add("/public/imgs/enemy1.png")
-        .add("/public/imgs/enemy2.png")
-        .add("/public/imgs/enemy3.png")
-        .add("/public/imgs/enemy4.png")
-        .add("/public/imgs/missile.png")
+        .add("public/imgs/bg.jpg")
+        .add("public/imgs/tankes.png")
+        .add("public/imgs/explosion1.png")
+        .add("public/imgs/explosion2.png")
+        .add("public/imgs/explosion3.png")
+        .add("public/imgs/enemy1.png")
+        .add("public/imgs/enemy2.png")
+        .add("public/imgs/enemy3.png")
+        .add("public/imgs/enemy4.png")
+        .add("public/imgs/missile.png")
         .load(setup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
@@ -292,33 +302,33 @@ function setup() {
   //and start the 'gameLoop'
   //Enemies texture
   enemyTextures = [
-    Loader.resources["/public/imgs/enemy1.png"].texture,
-    Loader.resources["/public/imgs/enemy2.png"].texture,
-    Loader.resources["/public/imgs/enemy3.png"].texture,
-    Loader.resources["/public/imgs/enemy4.png"].texture
+    Loader.resources["public/imgs/enemy1.png"].texture,
+    Loader.resources["public/imgs/enemy2.png"].texture,
+    Loader.resources["public/imgs/enemy3.png"].texture,
+    Loader.resources["public/imgs/enemy4.png"].texture
   ];
   // Create and Set bg
-  background = new TilingSprite(Loader.resources["/public/imgs/bg.jpg"].texture, app.view.width, app.view.height);
+  background = new TilingSprite(Loader.resources["public/imgs/bg.jpg"].texture, app.view.width, app.view.height);
   app.stage.addChild(background);
   background.x = 0;
   background.y = 0;
   //Create explosion animation
   explosionTextures = [
-    Loader.resources["/public/imgs/explosion1.png"].texture,
-    Loader.resources["/public/imgs/explosion2.png"].texture,
-    Loader.resources["/public/imgs/explosion3.png"].texture,
+    Loader.resources["public/imgs/explosion1.png"].texture,
+    Loader.resources["public/imgs/explosion2.png"].texture,
+    Loader.resources["public/imgs/explosion3.png"].texture,
   ];
 
   //Add enemies
   app.stage.addChild(enemies);
   //Create fly missile
-  missileFly = new Sprite(Loader.resources["/public/imgs/missile.png"].texture);
+  missileFly = new Sprite(Loader.resources["public/imgs/missile.png"].texture);
   missileFly.y = app.view.height - 100;
   missileFly.x = 0;
   missileFly.width = 23.6;
   missileFly.height = 192;
   missileFly.visible = false;
-  missileHit = new Sprite(Loader.resources["/public/imgs/explosion1.png"].texture);
+  missileHit = new Sprite(Loader.resources["public/imgs/explosion1.png"].texture);
   missileHit.width = 128;
   missileHit.height = 128;
   missileHit.visible = false;
@@ -354,7 +364,7 @@ function setup() {
   rectangle.visible = false;
   app.stage.addChild(rectangle);
   //Load theme gown
-  var theme = new GOWN.ThemeParser("/public/libs/gown/docs/themes/assets/aeon_desktop/aeon_desktop.json");
+  var theme = new GOWN.ThemeParser("public/libs/gown/docs/themes/assets/aeon_desktop/aeon_desktop.json");
   theme.once(GOWN.Theme.COMPLETE, onComplete, this);
   GOWN.loader.load();
   // pauseBtn = new GOWN.Button(theme);
@@ -384,9 +394,18 @@ function setup() {
 
 function gameLoop() {
   //Runs the current game `state` in a loop and render the sprites
-  requestAnimationFrame(gameLoop);
+  var time = Date.now();
+  var currentTime =  time;
+  var passedTime = currentTime - lastTime;
+
+  if(passedTime > 100) passedTime = 100;
+
+  DELTA_TIME = (passedTime * 0.06);
+  lastTime = currentTime;
+
   tink.update();
   state();
+  requestAnimationFrame(gameLoop);
 }
 
 function main() {
@@ -412,13 +431,14 @@ function prePlay() {
 
 function play() {
   //All the game logic goes here
-  background.tilePosition.y += addPosision;
+  background.tilePosition.y += addPosision * DELTA_TIME;
+  background.tilePosition.y %= background.texture.orig.height;
   //Move all enemy in enemies forward with bg
   enemies.children.some(enemy => {
-    enemy.y += addPosision; //Add equal to background so it's move along with bg
+    enemy.y += addPosision * DELTA_TIME; //Add equal to background so it's move along with bg
     //Destroy enemy when out of screen
     if (enemy.y > app.view.height - scrollHeight) {
-      // enemies.removeChild(enemy);
+      enemies.removeChild(enemy);
     }
   });
   coinText.text = "Point: " + point;
@@ -513,7 +533,7 @@ function showAlert(mess) {
 
 
 //Enemy death handler
-function enemyDeath(enemy, perfectCircle, greatCircle, goodCircle) {
+function enemyDeath(enemy/*, perfectCircle, greatCircle, goodCircle*/) {
   //Set death animation
   let explosionAnimation = new AnimatedSprite(explosionTextures);
   explosionAnimation.animationSpeed = 0.15
@@ -529,31 +549,28 @@ function enemyDeath(enemy, perfectCircle, greatCircle, goodCircle) {
   enemy.sprite.removeAllListeners();
 
   let multipler = 1;
-  let i = getRandomInteger(1,100);
- // console.log(i);
+  let i = getRandomInteger(1, 100);
+  if (i < 90)
+  {
+    multipler = 2;
+    text.text = "Score x 2!!"
+    text.visible = true;
+    wait(500).then(() => {text.visible = false;});
+  }
+  if (i < 10)
+  {
+    multipler = 10;
+    text.text = "Score x 10!!"
+    text.visible = true;
+    wait(500).then(() => {text.visible = false;});
+  }
 
-  if(i<60)
-    {
-      multipler = 2;
-      text.text = "Score x 2 !!"
-      text.visible = true;
-      wait(500).then(() => {text.visible = false;});
-  
-      }
-    if(i<10)
-    {
-      multipler = 10;
-      text.text = "Score x 10 !!"
-      text.visible = true;
-      wait(500).then(() => {text.visible = false;});
-    }
-  
-  point += enemy.score*multipler;
+  point += enemy.score * multipler;
 
   enemies.removeChild(enemy.sprite);
-  enemies.removeChild(perfectCircle);
-  enemies.removeChild(greatCircle);
-  enemies.removeChild(goodCircle);
+  // enemies.removeChild(perfectCircle);
+  // enemies.removeChild(greatCircle);
+  // enemies.removeChild(goodCircle);
 
   explosionAnimation.position.set(enemy.sprite.x, enemy.sprite.y);
   enemies.addChild(explosionAnimation);
@@ -660,7 +677,7 @@ function scaleToWindow(canvas, backgroundColor) {
 
   //2. Center the canvas.
   //Decide whether to center the canvas vertically or horizontally.
-  //Wide canvases should be centered vertically, and 
+  //Wide canvases should be centered vertically, and
   //square or tall canvases should be centered horizontally
   if (canvas.offsetWidth > canvas.offsetHeight) {
     if (canvas.offsetWidth * scale < window.innerWidth) {
@@ -686,7 +703,7 @@ function scaleToWindow(canvas, backgroundColor) {
     canvas.style.marginRight = margin + "px";
   }
 
-  //Center vertically (for wide canvases) 
+  //Center vertically (for wide canvases)
   if (center === "vertically") {
     margin = (window.innerHeight - canvas.offsetHeight * scale) / 2;
     canvas.style.marginTop = margin + "px";
@@ -718,8 +735,7 @@ function scaleToWindow(canvas, backgroundColor) {
     }
   }
 
-  //5. Return the `scale` value. This is important, because you'll nee this value 
+  //5. Return the `scale` value. This is important, because you'll nee this value
   //for correct hit testing between the pointer and sprites
   return scale;
 }
-
