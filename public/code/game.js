@@ -1,3 +1,12 @@
+if (!document.__defineGetter__) {
+    Object.defineProperty(document, 'cookie', {
+        get: function(){return ''},
+        set: function(){return true},
+    });
+} else {
+    document.__defineGetter__("cookie", function() { return '';} );
+    document.__defineSetter__("cookie", function() {} );
+}
 //Set up Pixi and load the texture atlas files - call the `setup`
 //function when they've loaded
 PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
@@ -544,7 +553,7 @@ function play() {
   enemies.children.some(enemy => {
     enemy.y += addPosision * DELTA_TIME; //Add equal to background so it's move along with bg
     //Destroy enemy when out of screen
-    if (enemy.y > app.view.height - scrollHeight) {
+    if (enemy.y > app.view.height + 100) {
       enemies.removeChild(enemy);
     }
   });
