@@ -27,7 +27,6 @@ let timeWaitSpawnEnemy = 120; //About 1/60s so 120 = 2s
 let addPosision = 2;
 let scaleTimes = 1;
 let timeWaitTap = 15;
-let countTap = 0;
 let point = 1000;
 let enemyMaxHealth = 5;
 let coinPerEnemy = 10;
@@ -53,6 +52,11 @@ let missileHit;
 let enemyTextures;
 let DELTA_TIME = 1;
 let lastTime = 0;
+let isMissileFlying = false;
+let timer = 0;
+let isClicked = false;
+let countTap = 0;
+let isClickedEnemy = false;
 
 let missile = {
   mId: 0,
@@ -202,31 +206,34 @@ let enemy = {
 
     e.interactive = true;
     e.hitArea = TransparencyHitArea.create(e);
-    e.countTap = 0;
-    let timer = 0;
-    let isClicked = false;
     // e.on("tap", function(e){ // Mobile test
     e.on("pointertap", function(event){
+      isClickedEnemy = true;
+      if (isMissileFlying) return;
       //handle double click enemy
       if (!isClicked) {
         isClicked = true;
         app.ticker.add(tapHandler = function(delta) {
+
           timer += delta;
           if (timer >= timeWaitTap) {
             isClicked = false;
             timer = 0;
             app.ticker.remove(tapHandler);
-            e.countTap = 0;
+            countTap = 0;
           }
         });
       }
-      e.countTap++;
-      if (e.countTap === 2 && timer < timeWaitTap) {
+      countTap++;
+      if (countTap === 2 && timer < timeWaitTap) {
+
         let localClickPos = event.data.getLocalPosition(e);
         let clickLocalPosX = localClickPos.x;
         let clickLocalPosY = localClickPos.y;
         let clickPosX = event.data.global.x;
         let clickPosY = event.data.global.y;
+
+        e.interactive = false;
 
         if (distanceBetweenPositions(enemy.perfectPos, localClickPos) < enemy.perfectPos.radius) {
           enemy.score = enemy.pointPerfectHit;
@@ -236,13 +243,13 @@ let enemy = {
           enemy.score = enemy.pointGoodHit;
         }
 
-        e.interactive = false;
         if (point >= currentMissile.pointPerShoot) {
           point -= currentMissile.pointPerShoot;
           coinText.text = "Point: " + point;
           //Stop scroll
           state = pause;
           missileFly.visible = true;
+          isMissileFlying = true;
           //Random fire spot
           // let fireSpotX = getRandomInteger(e.x + missileFly.width / 2, e.x + e.width - missileFly.width / 2);
           missileFly.x = clickPosX;
@@ -255,6 +262,7 @@ let enemy = {
               missileHit.x = missileFly.x - missileHit.width / 2;
               missileHit.y = missileFly.y - missileHit.height / 2;
               missileFly.visible = false;
+              isMissileFlying = false;
               missileFly.y = app.view.height - 100;
               // missileHit.x = e.x - e.width / 2;
               // missileHit.y = e.y - e.eheight / 2;
@@ -269,22 +277,26 @@ let enemy = {
                 // }
                 // enemyDeath(enemy, perfectCircle, greatCircle, goodCircle);
                 enemyDeath(enemy);
+                isClicked = false;
+                timer = 0;
+                app.ticker.remove(tapHandler);
+                countTap = 0;
+                isClickedEnemy = false;
+
                 // e.healthText.text = "Health: " + enemy.health;
                 app.ticker.speed = 1;
-                e.interactive = true;
+                // e.interactive = true;
                 state = play;
+                app.ticker.remove(missileFlyHandler);
               });
             }
           });
-          isClicked = false;
-          timer = 0;
-          app.ticker.remove(tapHandler);
-          e.countTap = 0;
+
         } else {
           showAlert("Not enough point to fire!");
         }
       }
-    })
+    });
     parent.addChild(e);
     // parent.addChild(goodCircle);
     // parent.addChild(greatCircle);
@@ -319,9 +331,94 @@ function setup() {
   ];
   // Create and Set bg
   background = new TilingSprite(Loader.resources["public/imgs/bg.jpg"].texture, app.view.width, app.view.height);
-  app.stage.addChild(background);
   background.x = 0;
   background.y = 0;
+  background.interactive = true;
+  background.on("pointertap", function(event){
+    if (isClickedEnemy) return;
+    // event.stopPropagation();
+    if (isMissileFlying) return;
+    //handle double click enemy
+    if (!isClicked) {
+      isClicked = true;
+      app.ticker.add(tapHandler = function(delta) {
+
+        timer += delta;
+        if (timer >= timeWaitTap) {
+          isClicked = false;
+          timer = 0;
+          app.ticker.remove(tapHandler);
+          countTap = 0;
+        }
+      });
+    }
+    countTap++;
+    if (countTap === 2 && timer < timeWaitTap) {
+
+      let clickPosX = event.data.global.x;
+      let clickPosY = event.data.global.y;
+
+      background.interactive = false;
+
+      if (point >= currentMissile.pointPerShoot) {
+        point -= currentMissile.pointPerShoot;
+        coinText.text = "Point: " + point;
+        //Stop scroll
+        state = pause;
+        missileFly.visible = true;
+        isMissileFlying = true;
+        //Random fire spot
+        // let fireSpotX = getRandomInteger(e.x + missileFly.width / 2, e.x + e.width - missileFly.width / 2);
+        missileFly.x = clickPosX;
+        app.ticker.add(missileFlyHandler = function(delta) {
+          // let fireSpotY = getRandomInteger(e.y + 10, e.y + e.height - 10);
+          if (missileFly.y > clickPosY)
+            missileFly.y -= addPosision * 8 * DELTA_TIME;
+          else {
+            missileHit.x = missileFly.x - missileHit.width / 2;
+            missileHit.y = missileFly.y - missileHit.height / 2;
+            missileFly.visible = false;
+            isMissileFlying = false;
+            missileFly.y = app.view.height - 100;
+            // missileHit.x = e.x - e.width / 2;
+            // missileHit.y = e.y - e.eheight / 2;
+
+            missileHit.visible = true;
+            wait(100).then(() => {
+              missileHit.visible = false;
+              // enemy.health -= currentMissile.damage;
+              //Enemy death
+              // if (enemy.health <= 0 ) {
+              //   enemyDeath(enemy);
+              // }
+              // enemyDeath(enemy, perfectCircle, greatCircle, goodCircle);
+
+              text.text = "Missed!!";
+              //Update text pos
+              showText();
+
+              isClicked = false;
+              timer = 0;
+              app.ticker.remove(tapHandler);
+              countTap = 0;
+              // e.healthText.text = "Health: " + enemy.health;
+              app.ticker.speed = 1;
+              background.interactive = true;
+
+              // e.interactive = true;
+              state = play;
+              app.ticker.remove(missileFlyHandler);
+            });
+          }
+        });
+
+      } else {
+        showAlert("Not enough point to fire!\nChange your missile!");
+      }
+    }
+  });
+  app.stage.addChild(background);
+
   //Create explosion animation
   explosionTextures = [
     Loader.resources["public/imgs/explosion1.png"].texture,
@@ -575,11 +672,7 @@ function enemyDeath(enemy/*, perfectCircle, greatCircle, goodCircle*/) {
   }
   if (multipler > 1)
     text.text += "\nScore x " + multipler + "!!";
-  //Update text pos
-  text.x = app.view.width / 2 - text.width / 2;
-  text.y = app.view.height / 2 - text.height / 2;
-  text.visible = true;
-  wait(500).then(() => {text.visible = false;});
+  showText();
 
   point += enemy.score * multipler;
   coinText.text = "Point: " + point;
@@ -594,6 +687,13 @@ function enemyDeath(enemy/*, perfectCircle, greatCircle, goodCircle*/) {
   explosionAnimation.play();
   // enemy.health = 0;
   // enemy.healthText.visible = false;
+}
+
+function showText() {
+  text.x = app.view.width / 2 - text.width / 2;
+  text.y = app.view.height / 2 - text.height / 2;
+  text.visible = true;
+  wait(500).then(() => {text.visible = false;});
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Helper func
