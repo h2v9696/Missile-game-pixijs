@@ -245,10 +245,13 @@ let enemy = {
         e.interactive = false;
 
         if (distanceBetweenPositions(enemy.perfectPos, localClickPos) < enemy.perfectPos.radius) {
+          text.text = "Perfect!!! ";
           enemy.score = enemy.pointPerfectHit;
         } else if (distanceBetweenPositions(enemy.greatPos, localClickPos) < enemy.greatPos.radius) {
+          text.text = "Great!! ";
           enemy.score = enemy.pointGreatHit;
         } else if (distanceBetweenPositions(enemy.goodPos, localClickPos) < enemy.goodPos.radius) {
+          text.text = "Good! ";
           enemy.score = enemy.pointGoodHit;
         }
 
@@ -671,7 +674,7 @@ function enemyDeath(enemy/*, perfectCircle, greatCircle, goodCircle*/) {
 
   let multipler = 1;
   let i = getRandomInteger(1, 100);
-  text.text = "+" + enemy.score;
+  text.text += "+" + enemy.score;
   if (i < 2)
   {
     multipler = 10;
