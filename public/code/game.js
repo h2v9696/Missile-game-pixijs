@@ -38,7 +38,7 @@ let text = new Text("Tap to start!", {
   wordWrap: true, wordWrapWidth: app.view.width,
   stroke: "white", strokeThickness: 4
 });
-let alertText = new Text("Not enough point to unlock!", {fontSize: 20, fill: "red", align: "center", stroke: "white", strokeThickness: 4});
+let alertText = new Text("Not enough point to unlock!", {fontSize: 30, fill: "red", align: "center", stroke: "white", strokeThickness: 4});
 let coinText = new Text("", {fontSize: 40, stroke: "white", strokeThickness: 4});
 let message;
 let group, scroll_group;
@@ -100,6 +100,7 @@ let missile = {
       if (missile.isLocked) {
         if (missile.pointNeededToUnlock < point) {
           point -= missile.pointNeededToUnlock;
+          coinText.text = "Point: " + point;
           missile.isLocked = false;
           locker.visible = false;
           pointPerShootText.visible = true;
@@ -199,10 +200,16 @@ let enemy = {
     e.on("pointertap", function(event){
       //handle double click enemy
       if (!isClicked) {
+        isClicked = true;
         app.ticker.add(tapHandler = function(delta) {
           timer += delta;
+          if (timer >= timeWaitTap) {
+            isClicked = false;
+            timer = 0;
+            app.ticker.remove(tapHandler);
+            e.countTap = 0;
+          }
         });
-        isClicked = true;
       }
       e.countTap++;
       if (e.countTap === 2 && timer < timeWaitTap) {
@@ -267,12 +274,6 @@ let enemy = {
         } else {
           showAlert("Not enough point to fire!");
         }
-      }
-      if (timer >= timeWaitTap) {
-        isClicked = false;
-        timer = 0;
-        app.ticker.remove(tapHandler);
-        e.countTap = 0;
       }
     })
     parent.addChild(e);
@@ -340,7 +341,7 @@ function setup() {
   coinText.x = 5;
   coinText.y = 0;
   alertText.x = app.view.width / 2 - alertText.width / 2;
-  alertText.y = 30;
+  alertText.y = coinText.height + 5;
   coinText.text = "Point: " + point;
   app.stage.addChild(text);
   app.stage.addChild(coinText);
@@ -441,7 +442,7 @@ function play() {
       enemies.removeChild(enemy);
     }
   });
-  coinText.text = "Point: " + point;
+  // coinText.text = "Point: " + point;
   if (point === 0) {
     state = end;
   }
@@ -566,7 +567,7 @@ function enemyDeath(enemy/*, perfectCircle, greatCircle, goodCircle*/) {
   }
 
   point += enemy.score * multipler;
-
+  coinText.text = "Point: " + point;
   enemies.removeChild(enemy.sprite);
   // enemies.removeChild(perfectCircle);
   // enemies.removeChild(greatCircle);
