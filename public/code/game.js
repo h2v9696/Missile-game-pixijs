@@ -1,12 +1,3 @@
-if (!document.__defineGetter__) {
-    Object.defineProperty(document, 'cookie', {
-        get: function(){return ''},
-        set: function(){return true},
-    });
-} else {
-    document.__defineGetter__("cookie", function() { return '';} );
-    document.__defineSetter__("cookie", function() {} );
-}
 //Set up Pixi and load the texture atlas files - call the `setup`
 //function when they've loaded
 PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
@@ -332,7 +323,6 @@ Loader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
 function setup() {
-  console.log("Test cookies 2");
   //Initialize the game sprites, set the game `state` to `play`
   //and start the 'gameLoop'
   //Enemies texture
