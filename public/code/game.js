@@ -332,6 +332,7 @@ Loader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
 function setup() {
+  console.log("Test cookies");
   //Initialize the game sprites, set the game `state` to `play`
   //and start the 'gameLoop'
   //Enemies texture
