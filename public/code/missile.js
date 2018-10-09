@@ -57,7 +57,7 @@ class Missile {
   }
 
   onTapMissile(sprite, missile) {
-    sprite.on("pointertap", function(e){
+    sprite.on("pointertap", function(event){
       // if (app.currentMissile.damage === this.damage) return;
       if (missile.isLocked) {
         if (missile.pointNeededToUnlock < app.point) {
