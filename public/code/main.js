@@ -4,47 +4,16 @@ class MainScene extends PIXI.Application {
     this.currentMissile = new Missile();
     this.point = 1000;
     this.isClickedEnemy = false;
-    this.alertText = new Text("Not enough point to unlock!", {
-      fontSize: 30,
-      fill: "red",
-      align: "center",
-      stroke: "white",
-      strokeThickness: 4});
     this.timer = 0;
     this.isClicked = false;
     this.state = null;
-    this.mainText = new Text("Tap to start!", {
-      fontSize: 80, align: "center",
-      wordWrap: true, wordWrapWidth: this.view.width,
-      stroke: "white", strokeThickness: 4
-    });
     this.countTap = 0;
-  }
 
-  showText(onComplete = null) {
-    this.mainText.x = this.view.width / 2 - this.mainText.width / 2;
-    this.mainText.y = this.view.height / 2 - this.mainText.height / 2;
-    this.mainText.visible = true;
-    Helper.wait(500).then(() => {
-      this.mainText.visible = false;
-      if (onComplete !== null)
-        onComplete()
-    });
-  }
+    let changePoint = function(amount) {
+      app.point += amount;
+    }
 
-  showAlert(mess) {
-    this.alertText.text = mess;
-    this.alertText.x = app.view.width / 2 - this.alertText.width / 2;
-    this.alertText.y = coinText.height + 5;
-    this.alertText.visible = true;
-    Helper.wait(2000).then(() => {
-      this.alertText.visible = false;
-    });
-    this.mainText = new Text("Tap to start!", {
-      fontSize: 80, align: "center",
-      wordWrap: true, wordWrapWidth: app.view.width,
-      stroke: "white", strokeThickness: 4
-    });
+    eventDispatcher.registerListeners('ChangePoint', changePoint);
   }
 
   isDoubleTap() {

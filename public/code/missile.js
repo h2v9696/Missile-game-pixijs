@@ -33,10 +33,10 @@ class Missile {
       this.missileText.text = "Selected";
     }
     m.interactive = true;
-    m.height = scroll_group.height - this.missileText.height;
+    m.height = uiManager.scroll_group.height - this.missileText.height;
     m.width = 150;
     this.missileText.x = m.x + m.width / 2 - this.missileText.width / 2;
-    this.missileText.y = scroll_group.height - this.missileText.height;
+    this.missileText.y = uiManager.scroll_group.height - this.missileText.height;
     this.locker.scale.x = 2;
     this.locker.scale.y = 2;
     this.locker.x = m.x + m.width / 2 - this.locker.width / 2;
@@ -58,6 +58,8 @@ class Missile {
 
   onTapMissile(sprite, missile) {
     sprite.on("pointertap", function(event){
+      var horizontalMoved = Math.abs(event.data.global.x - uiManager.scroll_group._startTouch.x);
+      if (horizontalMoved > 10) return;
       // if (app.currentMissile.damage === this.damage) return;
       if (missile.isLocked) {
         if (missile.pointNeededToUnlock < app.point) {
@@ -71,7 +73,7 @@ class Missile {
           // damageText.visible = true;
           missile.missileText.visible = false;
         } else {
-          app.showAlert("Not enough point to unlock!");
+          uiManager.showAlert("Not enough point to unlock!");
         }
       } else {
         app.currentMissile.missileText.visible = false;

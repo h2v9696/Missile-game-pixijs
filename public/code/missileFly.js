@@ -66,7 +66,7 @@ class MissileFlyEffect {
       });
 
     } else {
-      app.showAlert("Not enough point to fire!");
+      uiManager.showAlert("Not enough point to fire!");
     }
   }
 }

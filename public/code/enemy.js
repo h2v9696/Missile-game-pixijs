@@ -44,17 +44,17 @@ class Enemy {
     //Set random position in horizon
     e.x = Helper.getRandomInteger(0, app.view.width - e.width);
     e.y = - e.height * enemyManager.scaleTimes;
+    e.scale.x = enemyManager.scaleTimes;
+    e.scale.y = enemyManager.scaleTimes;
+    this.score = this.pointGoodHit;
     //Draw circle
     // visualizeCircle(e, this, parent);
     //Set scale enemy (will hange later)
-    e.scale.x = enemyManager.scaleTimes;
-    e.scale.y = enemyManager.scaleTimes;
     //Enemy Heath
     // this.health = enemyMaxHealth;
     // this.healthText = new Text("Health: " + this.health, {fontSize: 20, fill: "red", align: "center"});
     // this.healthText.x = this.x - this.healthText.width / 2 + enemy.width / 2;
     // this.healthText.y = this.y - this.healthText.height;
-    this.score = this.pointGoodHit;
 
     e.interactive = true;
     e.hitArea = TransparencyHitArea.create(e);
@@ -65,7 +65,6 @@ class Enemy {
 
   onTapEnemy(parent, sprite, enemy) {
     let isClicked = false;
-    let resultText = '';
 
     sprite.on("pointertap", function(event){
       if (missileFly.isMissileFlying) return;
@@ -79,18 +78,17 @@ class Enemy {
         sprite.interactive = false;
 
         if (Helper.distanceBetweenPositions(enemy.perfectPos, localClickPos) < enemy.perfectPos.radius) {
-          resultText = "Perfect!!! ";
+          uiManager.hitEnemyResultText = "Perfect!!! ";
           enemy.score = enemy.pointPerfectHit;
         } else if (Helper.distanceBetweenPositions(enemy.greatPos, localClickPos) < enemy.greatPos.radius) {
-          resultText = "Great!! ";
+          uiManager.hitEnemyResultText = "Great!! ";
           enemy.score = enemy.pointGreatHit;
         } else if (Helper.distanceBetweenPositions(enemy.goodPos, localClickPos) < enemy.goodPos.radius) {
-          resultText = "Good! ";
+          uiManager.hitEnemyResultText = "Good! ";
           enemy.score = enemy.pointGoodHit;
         }
 
         missileFly.shootMissile(() => {
-          app.mainText.text = resultText;
           enemy.enemyDeath(parent, enemy);
           app.isClickedEnemy = false;
           enemy.sprite.removeAllListeners();
@@ -101,14 +99,14 @@ class Enemy {
   }
 
   onMissileHitEnemy(enemy) {
+    this.enemyDeath(enemy);
+    app.isClickedEnemy = false;
     // enemy.health -= app.currentMissile.damage;
     //Enemy death
     // if (enemy.health <= 0 ) {
     //   enemyDeath(enemy);
     // }
     // enemyDeath(enemy, perfectCircle, greatCircle, goodCircle);
-    this.enemyDeath(enemy);
-    app.isClickedEnemy = false;
     // e.healthText.text = "Health: " + enemy.health;
     // e.interactive = true;
   }
@@ -118,8 +116,6 @@ class Enemy {
     //Set death animation
     let explosionAnimation = new AnimatedSprite(missileFly.explosionTextures);
     explosionAnimation.animationSpeed = 0.15
-    // explosionAnimation.width = 128;
-    // explosionAnimation.height = 128;
     explosionAnimation.loop = false;
     explosionAnimation.visible = false;
     explosionAnimation.pivot.x = 0.5;
@@ -127,10 +123,10 @@ class Enemy {
     explosionAnimation.scale.x = 0.7;
     explosionAnimation.scale.y = 0.7;
 
-
     let multipler = 1;
     let i = Helper.getRandomInteger(1, 100);
-    app.mainText.text += "+" + enemy.score;
+    let newText = uiManager.hitEnemyResultText + "+" + enemy.score;
+
     if (i < 2)
     {
       multipler = 10;
@@ -139,10 +135,9 @@ class Enemy {
       multipler = 2;
     }
     if (multipler > 1)
-      app.mainText.text += "\nScore x " + multipler + "!!";
-    app.showText();
-
-    app.point += enemy.score * multipler;
+      newText += "\nScore x " + multipler + "!!";
+    uiManager.showText(newText);
+    eventDispatcher.postEvent('ChangePoint', enemy.score * multipler);
     eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
     // enemies.removeChild(perfectCircle);
     // enemies.removeChild(greatCircle);
