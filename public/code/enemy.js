@@ -77,22 +77,28 @@ class Enemy {
 
         sprite.interactive = false;
 
-        if (Helper.distanceBetweenPositions(enemy.perfectPos, localClickPos) < enemy.perfectPos.radius) {
-          uiManager.hitEnemyResultText = "Perfect!!! ";
-          enemy.score = enemy.pointPerfectHit;
-        } else if (Helper.distanceBetweenPositions(enemy.greatPos, localClickPos) < enemy.greatPos.radius) {
-          uiManager.hitEnemyResultText = "Great!! ";
-          enemy.score = enemy.pointGreatHit;
-        } else if (Helper.distanceBetweenPositions(enemy.goodPos, localClickPos) < enemy.goodPos.radius) {
-          uiManager.hitEnemyResultText = "Good! ";
-          enemy.score = enemy.pointGoodHit;
-        }
-
-        missileFly.shootMissile(() => {
-          enemy.enemyDeath(parent, enemy);
-          app.isClickedEnemy = false;
-          enemy.sprite.removeAllListeners();
-          parent.removeChild(enemy.sprite);
+        missileFly.shootMissile((checkOutOfPoint) => {
+          if (checkOutOfPoint) {
+            if (Helper.distanceBetweenPositions(enemy.perfectPos, localClickPos) < enemy.perfectPos.radius) {
+              uiManager.hitEnemyResultText = "Perfect!!! ";
+              enemy.score = enemy.pointPerfectHit;
+            } else if (Helper.distanceBetweenPositions(enemy.greatPos, localClickPos) < enemy.greatPos.radius) {
+              uiManager.hitEnemyResultText = "Great!! ";
+              enemy.score = enemy.pointGreatHit;
+            } else if (Helper.distanceBetweenPositions(enemy.goodPos, localClickPos) < enemy.goodPos.radius) {
+              uiManager.hitEnemyResultText = "Good! ";
+              enemy.score = enemy.pointGoodHit;
+            }
+            enemy.enemyDeath(parent, enemy);
+            app.isClickedEnemy = false;
+            enemy.sprite.removeAllListeners();
+            parent.removeChild(enemy.sprite);
+          } else {
+            if (app.currentMissile.mId === 1)
+              app.state = end;
+            else
+              uiManager.showAlert("Change missile!");
+          }
         }, clickPosX, clickPosY);
       }
     });

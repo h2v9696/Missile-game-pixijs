@@ -81,13 +81,15 @@ function play() {
   background.update();
   //Move all enemy in enemyManager forward with bg
   enemyManager.update();
-  if (app.point === 0) {
-    state = end;
+  console.log(app.point + " " + app.state)
+  if (app.point <= 0) {
+    app.state = end;
   }
   //Spawn Enemy
 }
 
 function end() {
+  console.log("end" + app.point + " " + app.state)
   uiManager.showText("Game Over!!", null, true);
   //All the code that should run at the end of the game goes here
 }

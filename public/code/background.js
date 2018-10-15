@@ -26,11 +26,15 @@ class Background extends TilingSprite {
         let clickPosY = event.data.global.y;
 
         bgSprite.interactive = false;
-        missileFly.shootMissile(() => {
-          //Update text pos
-          uiManager.showText("Missed!!", () => {
+        missileFly.shootMissile((checkOutOfPoint) => {
+          if (checkOutOfPoint) {
+            //Update text pos
+            uiManager.showText("Missed!!", () => {
+              bgSprite.interactive = true;
+            });
+          } else {
             bgSprite.interactive = true;
-          });
+          }
         }, clickPosX, clickPosY);
       }
     });

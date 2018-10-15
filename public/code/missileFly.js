@@ -31,7 +31,8 @@ class MissileFlyEffect {
   }
 
   shootMissile(callback, posX, posY) {
-    if (app.point >= app.currentMissile.pointPerShoot) {
+    let checkOutOfPoint = (app.point >= app.currentMissile.pointPerShoot);
+    if (checkOutOfPoint) {
       eventDispatcher.postEvent('ChangePoint', -app.currentMissile.pointPerShoot);
       eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
       //Stop scroll
@@ -58,15 +59,15 @@ class MissileFlyEffect {
           Helper.wait(100).then(() => {
             missileFly.missileHit.visible = false;
             missileFly.isMissileFlying = false;
-            callback();
+            callback(checkOutOfPoint);
             app.resetTickerFucntion();
             app.state = play;
           });
         }
       });
-
     } else {
       uiManager.showAlert("Not enough point to fire!");
+      callback(checkOutOfPoint);
     }
   }
 }
