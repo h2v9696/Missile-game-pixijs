@@ -122,8 +122,7 @@ class UIManager extends Container {
     this.rectangle.visible = true;
     this.mainText.visible = false;
     this.coinText.visible = true;
-    if (this.scroll_group != null)
-      this.scroll_group.visible = true;
+    this.scroll_group.visible = true;
     this.pointer.tap = null;
     app.ticker.remove(this.textHandler);
   }
