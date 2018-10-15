@@ -13,7 +13,7 @@ class UIManager extends Container {
       stroke: "white",
       strokeThickness: 4});
     this.textHandler = null;
-    this.scroll_group = null;
+    this.scroll_group = new GOWN.ScrollContainer();
     this.rectangle = new Graphics();
     this.pointer = tink.makePointer();
     this.sLoading = true;
@@ -92,7 +92,6 @@ class UIManager extends Container {
   settingScroll() {
     var group = new GOWN.LayoutGroup();
     group.layout = new GOWN.layout.HorizontalLayout();
-    this.scroll_group = new GOWN.ScrollContainer();
     this.scroll_group.x = 10;
     this.scroll_group.y = app.view.height - this.scrollHeight;
     this.scroll_group._useMask = false;
