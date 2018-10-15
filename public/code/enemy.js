@@ -65,6 +65,7 @@ class Enemy {
 
   onTapEnemy(parent, sprite, enemy) {
     let isClicked = false;
+    let resultText = '';
 
     sprite.on("pointertap", function(event){
       if (missileFly.isMissileFlying) return;
@@ -78,17 +79,18 @@ class Enemy {
         sprite.interactive = false;
 
         if (Helper.distanceBetweenPositions(enemy.perfectPos, localClickPos) < enemy.perfectPos.radius) {
-          app.mainText.text = "Perfect!!! ";
+          resultText = "Perfect!!! ";
           enemy.score = enemy.pointPerfectHit;
         } else if (Helper.distanceBetweenPositions(enemy.greatPos, localClickPos) < enemy.greatPos.radius) {
-          app.mainText.text = "Great!! ";
+          resultText = "Great!! ";
           enemy.score = enemy.pointGreatHit;
         } else if (Helper.distanceBetweenPositions(enemy.goodPos, localClickPos) < enemy.goodPos.radius) {
-          app.mainText.text = "Good! ";
+          resultText = "Good! ";
           enemy.score = enemy.pointGoodHit;
         }
 
         missileFly.shootMissile(() => {
+          app.mainText.text = resultText;
           enemy.enemyDeath(parent, enemy);
           app.isClickedEnemy = false;
           enemy.sprite.removeAllListeners();

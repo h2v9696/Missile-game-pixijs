@@ -74,9 +74,6 @@ function setup() {
   background.y = 0;
   background.interactive = true;
   background.on("pointertap", function(event){
-    console.log(app.isClickedEnemy)
-    console.log(missileFly.isMissileFlying)
-
     if (app.isClickedEnemy) return;
     // event.stopPropagation();
     if (missileFly.isMissileFlying) return;
