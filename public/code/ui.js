@@ -80,7 +80,7 @@ class UIManager extends Container {
   waitTapScreen() {
     this.coinText.visible = false;
     if (!this.isLoading) {
-      this.mainText.text = "Tap to start!";
+      this.mainText.text = "Tap to start!\n" + user.username;
       this.pointer.tap = () => {
           this.settingPrePlay();
           enemyManager.spawnEnemies();

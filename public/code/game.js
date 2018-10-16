@@ -17,6 +17,11 @@ const addPosision = 2;
 let background;
 let DELTA_TIME = 1;
 let lastTime = 0;
+let user = {
+  id: 0,
+  username: "Guest",
+  point: 1000
+};
 //Load texture
 Loader
         .add("public/imgs/bg.jpg")
@@ -33,6 +38,11 @@ Loader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
 function setup() {
+  if (current_user != null) {
+    user = current_user;
+    app.point = user.point
+    eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
+  }
   //Initialize the game sprites, set the game `state` to `play` and start the 'gameLoop'
   //Enemies
   enemyManager.loadTextures();
@@ -52,6 +62,7 @@ function setup() {
   //Set pointer
   //set the game state to `play`
   app.state = main;
+
   //Start the game loop
   gameLoop();
 }
@@ -62,7 +73,6 @@ function gameLoop() {
   var time = Date.now();
   var currentTime =  time;
   var passedTime = currentTime - lastTime;
-
   if(passedTime > 100) passedTime = 100;
   DELTA_TIME = (passedTime * 0.06);
   lastTime = currentTime;

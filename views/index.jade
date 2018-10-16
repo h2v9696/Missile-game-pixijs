@@ -8,6 +8,21 @@ html
     script(src='/public/libs/TransparencyHitArea.js')
     script(src='/public/libs/gown/docs/dist/gown.js')
   body
+    script.
+        var current_user = null
+    div(align = "center")
+        if (!user)
+                p(style="font-size:20px; display: inline-block;") Welcome to missile game! Please log in.
+                a(href="/auth/facebook")
+                    img(src="public/imgs/fblogin.png", width = "200", height = "30")
+        else
+            div
+                h2
+                    = user.username + ', Point: ' + user.point
+                a(href="/logout") Logout
+            script.
+                current_user = !{JSON.stringify(user)}
+
     script(src='public/code/alias.js?newversion')
     script(src='public/code/helpers.js?newversion')
     script(src='public/code/eventDispatcher.js?newversion')

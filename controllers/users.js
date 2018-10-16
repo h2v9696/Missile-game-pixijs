@@ -1,6 +1,5 @@
-var express = require('express')
-  , router = express.Router()
+var User = require('../models/user')
 
-// Define routes handling profile requests
-
-module.exports = router
+exports.index_users = function(req, res) {
+  res.render('users', { title: 'Users', users: User.index() })
+}

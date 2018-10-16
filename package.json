@@ -19,13 +19,21 @@
   "author": "KIS-V.",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.5.2",
     "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.3",
+    "express-session": "^1.15.6",
     "jade": "^1.9.2",
-    "mongoose": "^5.2.10"
+    "mongoose": "^5.2.10",
+    "mysql": "^2.16.0",
+    "passport": "0.2.1",
+    "passport-facebook": "^2.1.1",
+    "passport-twitter": "1.0.2",
+    "sqlite3": "^4.0.2"
   },
   "devDependencies": {
-    "mocha": "^2.2.4",
+    "mocha": "^5.2.0",
     "should": "^6.0.1"
   }
 }
