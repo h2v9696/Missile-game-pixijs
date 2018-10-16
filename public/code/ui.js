@@ -26,9 +26,27 @@ class UIManager extends Container {
     this.scrollWidth = app.view.width;
     this.scrollHeight = 150;
     this.hitEnemyResultText = '';
+    this.pauseBtn = null;
+    this.loginAsGuestBtn = null;
+    this.loginAsUserBtn = null;
+    this.theme = null;
   }
 
   render() {
+    this.setupTexts();
+    this.setupScrollBG();
+    //Load theme gown
+    this.theme = new GOWN.ThemeParser("public/libs/gown/docs/themes/assets/metalworks_desktop/metalworks_desktop.json");
+    this.theme.once(GOWN.Theme.COMPLETE, this.settingUIs, this);
+    GOWN.loader.load();
+  }
+
+  settingUIs() {
+    this.settingScroll();
+    this.setupButtons();
+  }
+
+  setupTexts() {
     this.mainText.x = app.view.width / 2 - this.mainText.width / 2;
     this.mainText.y = app.view.height / 2 - this.mainText.height / 2;
     this.coinText.x = 5;
@@ -36,15 +54,18 @@ class UIManager extends Container {
     this.alertText.x = app.view.width / 2 - this.alertText.width / 2;
     this.alertText.y = this.coinText.height + 5;
     this.coinText.text = "Point: " + app.point;
+    this.coinText.visible = false;
     this.addChild(this.mainText);
     this.addChild(this.coinText);
     this.addChild(this.alertText);
     this.mainText.visible = true;
-    this.textEffect(this.mainText, 30);
     this.alertText.visible = false;
+  }
+
+  setupScrollBG() {
     //Setup scroll BG
-    this.rectangle.beginFill(0x000000);
-    this.rectangle.lineStyle(4, 0x000000, 1);
+    this.rectangle.beginFill(0xff6e00);
+    this.rectangle.lineStyle(2, 0x000000, 2);
     this.rectangle.drawRect(0, 0, this.scrollWidth - 4, this.scrollHeight + 10);
     this.rectangle.x = 2;
     this.rectangle.y = app.view.height - this.scrollHeight - 10;
@@ -52,33 +73,51 @@ class UIManager extends Container {
     this.rectangle.endFill();
     this.rectangle.visible = false;
     this.addChild(this.rectangle);
-    //Load theme gown
-    var theme = new GOWN.ThemeParser("public/libs/gown/docs/themes/assets/aeon_desktop/aeon_desktop.json");
-    theme.once(GOWN.Theme.COMPLETE, this.settingScroll, this);
-    GOWN.loader.load();
-    // pauseBtn = new GOWN.Button(theme);
-    //   pauseBtn.width = 150;
-    //   pauseBtn.height = 100;
-    //   pauseBtn.x = 20;
-    //   pauseBtn.y = 30;
-    //   pauseBtn.label = "PAUSE";
 
-    //   pauseBtn.on(GOWN.Button.TRIGGERED, function () {
-    //     if (app.app.app.state !== pause) {
-    //       pauseBtn.label = "RESUME";
-    //       app.app.state = pause;
-    //     }
-    //     else {
-    //       prePlay();
-    //       app.state = play;
-    //       pauseBtn.label = "PAUSE";
-    //     }
-    //   });
-    // app.stage.addChild(pauseBtn);
+  }
+
+  setupButtons() {
+    //Pause Btn
+    this.pauseBtn = new GOWN.Button(this.theme);
+    this.pauseBtn.width = 100;
+    this.pauseBtn.height = 50;
+    this.pauseBtn.x = app.view.width - this.pauseBtn.width - 5;
+    this.pauseBtn.y = 5;
+    this.pauseBtn.label = "PAUSE";
+    this.pauseBtn.visible = false;
+
+    this.pauseBtn.on(GOWN.Button.TRIGGERED, function () {
+      if (app.state !== pause) {
+        uiManager.pauseBtn.label = "RESUME";
+        app.state = pause;
+      }
+      else {
+        app.state = play;
+        uiManager.settingPrePlay();
+        uiManager.pauseBtn.label = "PAUSE";
+      }
+    });
+    this.addChild(this.pauseBtn);
+    // Login btn
+    //Pause Btn
+    this.loginAsGuestBtn = new GOWN.Button(this.theme);
+    this.loginAsGuestBtn.width = 250;
+    this.loginAsGuestBtn.height = 100;
+    this.loginAsGuestBtn.x = 10;
+    this.loginAsGuestBtn.y = app.view.height / 2 - this.mainText.height / 2 - 100;
+    this.loginAsGuestBtn.label = "Play as Guest";
+    this.loginAsGuestBtn.visible = true;
+
+    this.loginAsGuestBtn.on(GOWN.Button.TRIGGERED, function () {
+      app.state = main;
+      app.ticker.speed = 1;
+      uiManager.textEffect(uiManager.mainText, 30);
+      loginScreen.visible = false;
+    });
+    loginScreen.addChild(this.loginAsGuestBtn);
   }
 
   waitTapScreen() {
-    this.coinText.visible = false;
     if (!this.isLoading) {
       this.mainText.text = "Tap to start!\n" + user.username;
       this.pointer.tap = () => {
@@ -92,7 +131,7 @@ class UIManager extends Container {
   settingScroll() {
     var group = new GOWN.LayoutGroup();
     group.layout = new GOWN.layout.HorizontalLayout();
-    this.scroll_group = new GOWN.ScrollContainer();
+    this.scroll_group = new GOWN.ScrollContainer(this.theme);
     this.scroll_group.x = 10;
     this.scroll_group.y = app.view.height - this.scrollHeight;
     this.scroll_group._useMask = false;
@@ -123,8 +162,10 @@ class UIManager extends Container {
     this.mainText.visible = false;
     this.coinText.visible = true;
     this.scroll_group.visible = true;
+    this.pauseBtn.visible = true;
     this.pointer.tap = null;
     app.ticker.remove(this.textHandler);
+    app.ticker.speed = 1;
   }
 
   showText(text, onComplete = null, isGameOver = false) {

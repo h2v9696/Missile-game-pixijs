@@ -11,6 +11,7 @@ Helper.scaleToWindow(app.view);
 const enemyManager = new EnemyManager();
 const missileFly = new MissileFlyEffect();
 const uiManager = new UIManager();
+const loginScreen = new LoginScreen();
 const addPosision = 2;
 //Main
 //Game variable
@@ -34,6 +35,7 @@ Loader
         .add("public/imgs/enemy3.png")
         .add("public/imgs/enemy4.png")
         .add("public/imgs/missile.png")
+        .add("public/imgs/blackbg.jpg")
         .load(setup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
@@ -49,6 +51,7 @@ function setup() {
   // Create and Set bg
   background = new Background(Loader.resources["public/imgs/bg.jpg"].texture, app.view.width, app.view.height);
   background.render();
+  loginScreen.render();
   app.stage.addChild(background);
   //Create explosion animation
   missileFly.loadExplosionTextures();
@@ -59,9 +62,11 @@ function setup() {
   //Add UI
   uiManager.render();
   app.stage.addChild(uiManager);
+  app.stage.addChild(loginScreen);
+
   //Set pointer
   //set the game state to `play`
-  app.state = main;
+  app.state = pause;
 
   //Start the game loop
   gameLoop();

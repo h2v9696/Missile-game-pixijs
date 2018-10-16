@@ -17,6 +17,7 @@ class MainScene extends PIXI.Application {
   }
 
   isDoubleTap() {
+    if (app.ticker.speed === 0) return;
     let timeWaitTap = 15;
     if (!this.isClicked) {
       this.isClicked = true;
