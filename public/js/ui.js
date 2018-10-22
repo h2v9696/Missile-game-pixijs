@@ -29,6 +29,7 @@ class UIManager extends Container {
     this.pauseBtn = null;
     this.loginAsGuestBtn = null;
     this.loginAsUserBtn = null;
+    this.logoutBtn = null;
     this.theme = null;
   }
 
@@ -90,6 +91,10 @@ class UIManager extends Container {
       if (app.state !== pause) {
         uiManager.pauseBtn.label = "RESUME";
         app.state = pause;
+        if (!current_user)
+          uiManager.logoutBtn.label = "To Main Menu"
+        uiManager.logoutBtn.visible = true
+
       }
       else {
         app.state = play;
@@ -130,6 +135,20 @@ class UIManager extends Container {
       window.location.href = "/auth/facebook";
     });
     loginScreen.addChild(this.loginAsUserBtn);
+
+    // Logout facebook
+    this.logoutBtn = new GOWN.Button(this.theme);
+    this.logoutBtn.width = 300;
+    this.logoutBtn.height = 50;
+    this.logoutBtn.x = app.view.width / 2 - this.logoutBtn.width/2;
+    this.logoutBtn.y = this.logoutBtn.y + this.logoutBtn.height + 100;
+    this.logoutBtn.label = "Logout";
+    this.logoutBtn.visible = false;
+
+    this.logoutBtn.on(GOWN.Button.TRIGGERED, function(){
+      window.location.href = "/logout";
+    });
+    this.addChild(this.logoutBtn);
   }
 
   waitTapScreen() {

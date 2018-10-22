@@ -14,6 +14,7 @@ class LoginScreen extends Container {
     this.bg.visible = true;
     this.bg.interactive = true;
     this.addChild(this.bg);
+
   }
 
   addButton() {
