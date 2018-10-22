@@ -98,13 +98,14 @@ class UIManager extends Container {
       }
     });
     this.addChild(this.pauseBtn);
+
     // Login btn
-    //Pause Btn
+    // Login as guest
     this.loginAsGuestBtn = new GOWN.Button(this.theme);
-    this.loginAsGuestBtn.width = 250;
-    this.loginAsGuestBtn.height = 100;
-    this.loginAsGuestBtn.x = 10;
-    this.loginAsGuestBtn.y = app.view.height / 2 - this.mainText.height / 2 - 100;
+    this.loginAsGuestBtn.width = 300;
+    this.loginAsGuestBtn.height = 50;
+    this.loginAsGuestBtn.x = app.view.width / 2 - this.loginAsGuestBtn.width / 2;
+    this.loginAsGuestBtn.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height + 50;
     this.loginAsGuestBtn.label = "Play as Guest";
     this.loginAsGuestBtn.visible = true;
 
@@ -115,6 +116,20 @@ class UIManager extends Container {
       loginScreen.visible = false;
     });
     loginScreen.addChild(this.loginAsGuestBtn);
+
+    // Login by facebook
+    this.loginAsUserBtn = new GOWN.Button(this.theme);
+    this.loginAsUserBtn.width = 300;
+    this.loginAsUserBtn.height = 50;
+    this.loginAsUserBtn.x = app.view.width / 2 - this.loginAsUserBtn.width/2;
+    this.loginAsUserBtn.y = this.loginAsGuestBtn.y + this.loginAsGuestBtn.height + 10;
+    this.loginAsUserBtn.label = "Login by facebook";
+    this.loginAsUserBtn.visible = true;
+
+    this.loginAsUserBtn.on(GOWN.Button.TRIGGERED, function(){
+      window.location.href = "/auth/facebook";
+    });
+    loginScreen.addChild(this.loginAsUserBtn);
   }
 
   waitTapScreen() {
