@@ -11,10 +11,10 @@ class EnemyManager extends Container {
 
   loadTextures() {
     this.enemyTextures = [
-      Loader.resources["public/imgs/enemy1.png"].texture,
-      Loader.resources["public/imgs/enemy2.png"].texture,
-      Loader.resources["public/imgs/enemy3.png"].texture,
-      Loader.resources["public/imgs/enemy4.png"].texture
+      Loader.resources["public/img/enemy1.png"].texture,
+      Loader.resources["public/img/enemy2.png"].texture,
+      Loader.resources["public/img/enemy3.png"].texture,
+      Loader.resources["public/img/enemy4.png"].texture
     ];
   }
 

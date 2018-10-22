@@ -25,17 +25,17 @@ let user = {
 };
 //Load texture
 Loader
-        .add("public/imgs/bg.jpg")
-        .add("public/imgs/tankes.png")
-        .add("public/imgs/explosion1.png")
-        .add("public/imgs/explosion2.png")
-        .add("public/imgs/explosion3.png")
-        .add("public/imgs/enemy1.png")
-        .add("public/imgs/enemy2.png")
-        .add("public/imgs/enemy3.png")
-        .add("public/imgs/enemy4.png")
-        .add("public/imgs/missile.png")
-        .add("public/imgs/blackbg.jpg")
+        .add("public/img/bg.jpg")
+        .add("public/img/tankes.png")
+        .add("public/img/explosion1.png")
+        .add("public/img/explosion2.png")
+        .add("public/img/explosion3.png")
+        .add("public/img/enemy1.png")
+        .add("public/img/enemy2.png")
+        .add("public/img/enemy3.png")
+        .add("public/img/enemy4.png")
+        .add("public/img/missile.png")
+        .add("public/img/blackbg.jpg")
         .load(setup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
@@ -49,7 +49,7 @@ function setup() {
   //Enemies
   enemyManager.loadTextures();
   // Create and Set bg
-  background = new Background(Loader.resources["public/imgs/bg.jpg"].texture, app.view.width, app.view.height);
+  background = new Background(Loader.resources["public/img/bg.jpg"].texture, app.view.width, app.view.height);
   background.render();
   loginScreen.render();
   app.stage.addChild(background);

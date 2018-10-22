@@ -1,8 +1,6 @@
 const express = require('express')
   , app = express()
   , port = process.env.PORT || 3000
-  , sqlite3 = require('sqlite3')
-  , db = new sqlite3.Database('users.db')
   , passport = require('passport')
   , util = require('util')
   , FacebookStrategy = require('passport-facebook').Strategy

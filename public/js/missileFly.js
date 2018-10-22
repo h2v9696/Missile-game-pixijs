@@ -8,13 +8,13 @@ class MissileFlyEffect {
 
   render(parent) {
     //Create fly missile
-    this.missileSprite = new Sprite(Loader.resources["public/imgs/missile.png"].texture);
+    this.missileSprite = new Sprite(Loader.resources["public/img/missile.png"].texture);
     this.missileSprite.y = app.view.height - 100;
     this.missileSprite.x = 0;
     this.missileSprite.width = 23.6;
     this.missileSprite.height = 192;
     this.missileSprite.visible = false;
-    this.missileHit = new Sprite(Loader.resources["public/imgs/explosion1.png"].texture);
+    this.missileHit = new Sprite(Loader.resources["public/img/explosion1.png"].texture);
     this.missileHit.width = 128;
     this.missileHit.height = 128;
     this.missileHit.visible = false;
@@ -24,9 +24,9 @@ class MissileFlyEffect {
 
   loadExplosionTextures() {
     this.explosionTextures = [
-      Loader.resources["public/imgs/explosion1.png"].texture,
-      Loader.resources["public/imgs/explosion2.png"].texture,
-      Loader.resources["public/imgs/explosion3.png"].texture,
+      Loader.resources["public/img/explosion1.png"].texture,
+      Loader.resources["public/img/explosion2.png"].texture,
+      Loader.resources["public/img/explosion3.png"].texture,
     ];
   }
 

@@ -36,7 +36,7 @@ class UIManager extends Container {
     this.setupTexts();
     this.setupScrollBG();
     //Load theme gown
-    this.theme = new GOWN.ThemeParser("public/libs/gown/docs/themes/assets/metalworks_desktop/metalworks_desktop.json");
+    this.theme = new GOWN.ThemeParser("public/js/libs/gown/docs/themes/assets/metalworks_desktop/metalworks_desktop.json");
     this.theme.once(GOWN.Theme.COMPLETE, this.settingUIs, this);
     GOWN.loader.load();
   }

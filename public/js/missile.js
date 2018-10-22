@@ -14,9 +14,9 @@ class Missile {
   render(parent) {
     let mContainer = new Container();
     let m = new Sprite(
-      Helper.frame("public/imgs/tankes.png", 128, 64, 32, 32)
+      Helper.frame("public/img/tankes.png", 128, 64, 32, 32)
     );
-    this.locker = new Sprite(Helper.frame("public/imgs/tankes.png", 224, 64, 32, 32));
+    this.locker = new Sprite(Helper.frame("public/img/tankes.png", 224, 64, 32, 32));
     this.pointPerShootText = new Text(this.pointPerShoot + "P", {fontSize: 30, align: "center"});
     // let damageText = new Text(missile.damage + "D", {fontSize: 20, align: "center"});
     this.pointPerShootText.visible = false;

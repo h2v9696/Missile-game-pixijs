@@ -5,7 +5,7 @@ class LoginScreen extends Container {
   }
 
   render() {
-    this.bg = new Sprite(Loader.resources["public/imgs/blackbg.jpg"].texture);
+    this.bg = new Sprite(Loader.resources["public/img/blackbg.jpg"].texture);
     this.bg.alpha = 0.5
     this.bg.y = 0;
     this.bg.x = 0;
