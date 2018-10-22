@@ -29,6 +29,7 @@ class UIManager extends Container {
     this.pauseBtn = null;
     this.loginAsGuestBtn = null;
     this.loginAsUserBtn = null;
+    this.logoutBtn = null;
     this.theme = null;
   }
 
@@ -90,21 +91,26 @@ class UIManager extends Container {
       if (app.state !== pause) {
         uiManager.pauseBtn.label = "RESUME";
         app.state = pause;
+        if (!current_user)
+          uiManager.logoutBtn.label = "To Main Menu"
+        uiManager.logoutBtn.visible = true
       }
       else {
         app.state = play;
         uiManager.settingPrePlay();
         uiManager.pauseBtn.label = "PAUSE";
+        uiManager.logoutBtn.visible = false
       }
     });
     this.addChild(this.pauseBtn);
+
     // Login btn
-    //Pause Btn
+    // Login as guest
     this.loginAsGuestBtn = new GOWN.Button(this.theme);
-    this.loginAsGuestBtn.width = 250;
-    this.loginAsGuestBtn.height = 100;
-    this.loginAsGuestBtn.x = 10;
-    this.loginAsGuestBtn.y = app.view.height / 2 - this.mainText.height / 2 - 100;
+    this.loginAsGuestBtn.width = 300;
+    this.loginAsGuestBtn.height = 50;
+    this.loginAsGuestBtn.x = app.view.width / 2 - this.loginAsGuestBtn.width / 2;
+    this.loginAsGuestBtn.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height + 50;
     this.loginAsGuestBtn.label = "Play as Guest";
     this.loginAsGuestBtn.visible = true;
 
@@ -115,6 +121,34 @@ class UIManager extends Container {
       loginScreen.visible = false;
     });
     loginScreen.addChild(this.loginAsGuestBtn);
+
+    // Login by facebook
+    this.loginAsUserBtn = new GOWN.Button(this.theme);
+    this.loginAsUserBtn.width = 300;
+    this.loginAsUserBtn.height = 50;
+    this.loginAsUserBtn.x = app.view.width / 2 - this.loginAsUserBtn.width/2;
+    this.loginAsUserBtn.y = this.loginAsGuestBtn.y + this.loginAsGuestBtn.height + 10;
+    this.loginAsUserBtn.label = "Login by facebook";
+    this.loginAsUserBtn.visible = true;
+
+    this.loginAsUserBtn.on(GOWN.Button.TRIGGERED, function(){
+      window.location.href = "/auth/facebook";
+    });
+    loginScreen.addChild(this.loginAsUserBtn);
+
+    // Logout facebook
+    this.logoutBtn = new GOWN.Button(this.theme);
+    this.logoutBtn.width = 300;
+    this.logoutBtn.height = 50;
+    this.logoutBtn.x = app.view.width / 2 - this.logoutBtn.width/2;
+    this.logoutBtn.y = this.logoutBtn.y + this.logoutBtn.height + 100;
+    this.logoutBtn.label = "Logout";
+    this.logoutBtn.visible = false;
+
+    this.logoutBtn.on(GOWN.Button.TRIGGERED, function(){
+      window.location.href = "/logout";
+    });
+    this.addChild(this.logoutBtn);
   }
 
   waitTapScreen() {

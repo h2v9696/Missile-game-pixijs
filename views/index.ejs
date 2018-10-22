@@ -2,35 +2,50 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Missile game</title>
         <script src="public/js/libs/gown/docs/lib/pixi/pixi.js"></script>
         <script src="public/js/libs/tink.js"></script>
         <script src="public/js/libs/TransparencyHitArea.js"></script>
         <script src="public/js/libs/gown/docs/dist/gown.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="public/js/libs/jquery.min.js"></script>
     </head>
     <body>
+        <!-- <div id = "login">
+            <a>Login</a>
+        </div> -->
         <script>
             var current_user = null;
+            // $(document).ready(function() {
+            //     $("#login a").click(function() {
+            //     jQuery.ajax({
+            //         type: "GET",
+            //         url: "/auth/facebook/",
+            //         dataType:"application/json",
+            //         data: user,
+            //         success:function(response){
+            //              console.log(response)
+            //             },
+            //          error: function(xhr, textStatus, errorThrown) {
+            //                 alert('Error!  Status = ' + textStatus);
+            //              }
+
+            //     });
+            // });
+            //     // $("#login a").click(function() {
+            //     //     $.get("/auth/facebook", function(data){
+            //     //         console.log("Data: " + data);
+            //     //     });
+            //     // }
+            // });
         </script>
         <div align = "center">
-            <% if (!user) { %>
-                    <p style="font-size:20px; display: inline-block;">
-                        Welcome to missile game! Please log in.
-                    </p>
-                    <a href="/auth/facebook">
-                        <img src="public/img/fblogin.png", width = "200", height = "30">
-                    </a>
-            <% } else {
-                    current_user = JSON.stringify(user) %>
-                    <div>
-                        <h2>
-                            <%= user.username + ', Point: ' + user.point %></h2>
-                        <a href="/logout"> Logout </a>
-                    </div>
+            <% if (user) {%>
+                <script>
+                    current_user = <%- JSON.stringify(user) %>
+                </script>
             <% } %>
         </div>
+
         <script src="public/js/alias.js?newversion"></script>
         <script src="public/js/helpers.js?newversion"></script>
         <script src="public/js/eventDispatcher.js?newversion"></script>

@@ -9,7 +9,8 @@ const express = require('express')
   , bodyParser = require('body-parser')
   , config = require('./config/config')
   , mysql = require('mysql')
-
+  , https = require('https')
+  , fs = require('fs')
 var users = require('./models/user.js')
 
 var connection = mysql.createConnection({
@@ -86,4 +87,11 @@ app.use(express.static('.'));
 app.listen(port, function() {
   console.log('Listening on port ' + port)
 });
+// https.createServer({
+//   key: fs.readFileSync('server.key'),
+//   cert: fs.readFileSync('server.cert')
+// }, app)
+// .listen(3000, function () {
+//   console.log('Example app listening on port 3000! Go to https://localhost:3000/')
+// })
 

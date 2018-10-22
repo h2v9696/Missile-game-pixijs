@@ -19,6 +19,7 @@ const addPosision = 2;
 //Game variable
 let background;
 let DELTA_TIME = 1;
+let set= false;
 let lastTime = 0;
 let user = {
   id: 0,
@@ -69,6 +70,12 @@ function setup() {
   //Set pointer
   //set the game state to `play`
   app.state = pause;
+  if (current_user) {
+    app.state = main;
+    app.ticker.speed = 1;
+    uiManager.textEffect(uiManager.mainText, 30);
+    loginScreen.visible = false;
+  }
   //Start the game loop
   gameLoop();
 }
@@ -76,6 +83,13 @@ function setup() {
 function gameLoop() {
   //Runs the current game `state` in a loop and render the sprites
   //Custom delta time
+  if (current_user != null && !set) {
+    user = current_user;
+    app.point = user.point
+    eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
+    set = true
+  }
+
   var time = Date.now();
   var currentTime =  time;
   var passedTime = currentTime - lastTime;
