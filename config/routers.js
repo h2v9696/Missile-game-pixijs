@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var user_controller = require('../controllers/users')
 var passport = require('passport')
+var ejs = require('ejs')
+var ejsLint = require('ejs-lint');
 
 router.get('/', function(req, res) {
   res.render('index', { user: req.user })
@@ -9,9 +11,9 @@ router.get('/', function(req, res) {
 
 router.get('/users', user_controller.index_users)
 
-router.get('/', function(req, res){
-  res.render('index', { user: req.user });
-});
+// router.get('/', function(req, res){
+//   res.render(ejsLint('index', { user: req.user }));
+// });
 
 //Passport Router
 router.get('/auth/facebook', passport.authenticate('facebook'));

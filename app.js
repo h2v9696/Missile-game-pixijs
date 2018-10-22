@@ -31,6 +31,7 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 // Use the FacebookStrategy within Passport.
+// Need split into mvc
 passport.use(new FacebookStrategy({
     clientID: config.facebook_api_key,
     clientSecret:config.facebook_api_secret ,
@@ -73,8 +74,7 @@ passport.use(new FacebookStrategy({
 ));
 
 app.set('views', __dirname + '/views')
-app.engine('jade', require('jade').__express)
-app.set('view engine', 'jade')
+app.set('view engine', 'ejs')
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));

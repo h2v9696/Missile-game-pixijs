@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Missile game</title>
+        <script src="public/js/libs/gown/docs/lib/pixi/pixi.js"></script>
+        <script src="public/js/libs/tink.js"></script>
+        <script src="public/js/libs/TransparencyHitArea.js"></script>
+        <script src="public/js/libs/gown/docs/dist/gown.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    </head>
+    <body>
+        <script>
+            var current_user = null;
+        </script>
+        <div align = "center">
+            <% if (!user) { %>
+                    <p style="font-size:20px; display: inline-block;">
+                        Welcome to missile game! Please log in.
+                    </p>
+                    <a href="/auth/facebook">
+                        <img src="public/img/fblogin.png", width = "200", height = "30">
+                    </a>
+            <% } else {
+                    current_user = JSON.stringify(user) %>
+                    <div>
+                        <h2>
+                            <%= user.username + ', Point: ' + user.point %></h2>
+                        <a href="/logout"> Logout </a>
+                    </div>
+            <% } %>
+        </div>
+        <script src="public/js/alias.js?newversion"></script>
+        <script src="public/js/helpers.js?newversion"></script>
+        <script src="public/js/eventDispatcher.js?newversion"></script>
+        <script src="public/js/missileFly.js?newversion"></script>
+        <script src="public/js/missile.js?newversion"></script>
+        <script src="public/js/enemyManager.js?newversion"></script>
+        <script src="public/js/enemy.js?newversion"></script>
+        <script src="public/js/background.js?newversion"></script>
+        <script src="public/js/ui.js?newversion"></script>
+        <script src="public/js/main.js?newversion"></script>
+        <script src="public/js/loginScreen.js?newversion"></script>
+        <script src="public/js/game.js?newversion"></script>
+    </body>
+</html>

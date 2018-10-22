@@ -1,4 +1,5 @@
 //Observe partten
+// var current_user = null;
 const eventDispatcher = new EventDispatcher();
 //Set up Pixi and load the texture atlas files - call the `setup`
 //function when they've loaded
@@ -6,6 +7,7 @@ PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
 let app = new MainScene(590, 960, 0x3FA000)
 const tink = new Tink(PIXI, app.view);
 document.body.appendChild(app.view);
+window.addEventListener('resize', resize);
 Helper.scaleToWindow(app.view);
 //Const
 const enemyManager = new EnemyManager();
@@ -67,7 +69,6 @@ function setup() {
   //Set pointer
   //set the game state to `play`
   app.state = pause;
-
   //Start the game loop
   gameLoop();
 }
@@ -109,4 +110,8 @@ function end() {
 
 function pause() {
     app.ticker.speed = 0;
+}
+
+function resize() {
+  Helper.scaleToWindow(app.view);
 }

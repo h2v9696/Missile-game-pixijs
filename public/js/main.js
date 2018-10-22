@@ -1,6 +1,7 @@
 class MainScene extends PIXI.Application {
   constructor(width, height, bgColor) {
-    super(width, height, {backgroundColor : bgColor}, {legacy : true});
+    super(width, height, {backgroundColor : bgColor}, {legacy : true},
+      {autoResize: true}, {resolution: devicePixelRatio});
     this.currentMissile = new Missile();
     this.point = 1000;
     this.isClickedEnemy = false;
