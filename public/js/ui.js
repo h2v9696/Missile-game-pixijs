@@ -94,12 +94,12 @@ class UIManager extends Container {
         if (!current_user)
           uiManager.logoutBtn.label = "To Main Menu"
         uiManager.logoutBtn.visible = true
-
       }
       else {
         app.state = play;
         uiManager.settingPrePlay();
         uiManager.pauseBtn.label = "PAUSE";
+        uiManager.logoutBtn.visible = false
       }
     });
     this.addChild(this.pauseBtn);
