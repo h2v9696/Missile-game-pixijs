@@ -60,8 +60,8 @@ function setup() {
   missileFly.render(app.stage);
   //Add UI
   uiManager.render();
-  app.stage.addChild(uiManager);
   app.stage.addChild(loginScreen);
+  app.stage.addChild(uiManager);
 
   //Set pointer
   //set the game state to `play`
