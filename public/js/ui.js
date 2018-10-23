@@ -122,29 +122,23 @@ class UIManager extends Container {
     });
     loginScreen.addChild(this.loginAsGuestBtn);
 
-    // Login by facebook
-    // this.loginAsUserBtn = new GOWN.Button(this.theme);
-    // this.loginAsUserBtn.width = 300;
-    // this.loginAsUserBtn.height = 50;
-    // this.loginAsUserBtn.x = app.view.width / 2 - this.loginAsUserBtn.width/2;
-    // this.loginAsUserBtn.y = this.loginAsGuestBtn.y + this.loginAsGuestBtn.height + 10;
-    // this.loginAsUserBtn.label = "Login by facebook";
-    // this.loginAsUserBtn.visible = true;
+    //Login by facebook
+    this.loginAsUserBtn = new GOWN.Button(this.theme);
+    this.loginAsUserBtn.width = 300;
+    this.loginAsUserBtn.height = 50;
+    this.loginAsUserBtn.x = app.view.width / 2 - this.loginAsUserBtn.width/2;
+    this.loginAsUserBtn.y = this.loginAsGuestBtn.y + this.loginAsGuestBtn.height + 10;
+    this.loginAsUserBtn.visible = true;
 
-    // this.loginAsUserBtn.on(GOWN.Button.TRIGGERED, function(){
-    //   window.location.href = "/auth/facebook";
-    // });
-    // loginScreen.addChild(this.loginAsUserBtn);
+    this.fbButtonSprite = new Sprite(Loader.resources["public/img/fblogin.png"].texture);
+    this.fbButtonSprite.width = this.loginAsUserBtn.width;
+    this.fbButtonSprite.height = this.loginAsUserBtn.height;  
+    this.loginAsUserBtn.addChild(this.fbButtonSprite);
 
-    this.fbButtonSprite = new Sprite(Loader.resources["public/img/fblogin.png"].texture, 300, 50);
-    this.fbButtonSprite.width = 300;
-    this.fbButtonSprite.height = 50;
-    this.fbButtonSprite.x = app.view.width / 2 - this.fbButtonSprite.width/2;
-    this.fbButtonSprite.y = this.loginAsGuestBtn.y + this.loginAsGuestBtn.height + 10;
-    this.fbButtonSprite.interactive = true;
-    this.fbButtonSprite.buttonMode = true;
-    this.fbButtonSprite.on('pointerdown', this.onFBLogin);
-    loginScreen.addChild(this.fbButtonSprite);
+    this.loginAsUserBtn.on(GOWN.Button.TRIGGERED, function(){
+      window.location.href = "/auth/facebook";
+    });
+    loginScreen.addChild(this.loginAsUserBtn);
 
     // Logout facebook
     this.logoutBtn = new GOWN.Button(this.theme);
@@ -248,9 +242,5 @@ class UIManager extends Container {
     Helper.wait(2000).then(() => {
       this.alertText.visible = false;
     });
-  }
-
-  onFBLogin(){
-    window.location.href = "/auth/facebook";
   }
 }
