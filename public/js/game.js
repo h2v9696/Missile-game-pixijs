@@ -67,20 +67,19 @@ function setup() {
   //set the game state to `play`
   app.state = pause;
   if (current_user) {
-    app.state = main;
-    app.ticker.speed = 1;
-    uiManager.textEffect(uiManager.mainText, 30);
-    loginScreen.visible = false;
+    uiManager.mainScreen()
   }
   //Start the game loop
   gameLoop();
 }
 
 function gameLoop() {
-  if (current_user != null && !setUser) {
-    user = current_user;
+  if (!setUser) {
+    if (current_user != null)
+      user = current_user;
     app.point = user.point
     eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
+    setUser = true;
   }
   //Runs the current game `state` in a loop and render the sprites
   //Custom delta time

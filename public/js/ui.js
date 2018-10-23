@@ -168,11 +168,11 @@ class UIManager extends Container {
     this.replayBtn.x = app.view.width / 2 - this.replayBtn.width/2;
     this.replayBtn.y = this.replayBtn.y + this.replayBtn.height + 100;
     this.replayBtn._textStyle = this.replayBtn.height / 2;
-    this.replayBtn.label = "Replay";
+    this.replayBtn.label = "Continue? 10$ for 1000 point";
     this.replayBtn.visible = false;
 
     this.replayBtn.on(GOWN.Button.TRIGGERED, function(){
-      current_user.point = 1000;
+      user.point = 1000;
       setUser = false;
       uiManager.mainScreen();
     });
