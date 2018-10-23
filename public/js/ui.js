@@ -30,6 +30,7 @@ class UIManager extends Container {
     this.loginAsGuestBtn = null;
     this.loginAsUserBtn = null;
     this.logoutBtn = null;
+    this.saveBtn = null;
     this.theme = null;
   }
 
@@ -89,17 +90,10 @@ class UIManager extends Container {
 
     this.pauseBtn.on(GOWN.Button.TRIGGERED, function () {
       if (app.state !== pause) {
-        uiManager.pauseBtn.label = "RESUME";
-        app.state = pause;
-        if (!current_user)
-          uiManager.logoutBtn.label = "To Main Menu"
-        uiManager.logoutBtn.visible = true
+        uiManager.pause()
       }
       else {
-        app.state = play;
-        uiManager.settingPrePlay();
-        uiManager.pauseBtn.label = "PAUSE";
-        uiManager.logoutBtn.visible = false
+        uiManager.resume()
       }
     });
     this.addChild(this.pauseBtn);
@@ -107,48 +101,105 @@ class UIManager extends Container {
     // Login btn
     // Login as guest
     this.loginAsGuestBtn = new GOWN.Button(this.theme);
-    this.loginAsGuestBtn.width = 300;
-    this.loginAsGuestBtn.height = 50;
+    this.loginAsGuestBtn.width = 450;
+    this.loginAsGuestBtn.height = 69;
+    this.loginAsGuestBtn._textStyle = this.loginAsGuestBtn.height / 2;
     this.loginAsGuestBtn.x = app.view.width / 2 - this.loginAsGuestBtn.width / 2;
-    this.loginAsGuestBtn.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height + 50;
+    this.loginAsGuestBtn.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height - 250;
     this.loginAsGuestBtn.label = "Play as Guest";
     this.loginAsGuestBtn.visible = true;
 
     this.loginAsGuestBtn.on(GOWN.Button.TRIGGERED, function () {
-      app.state = main;
-      app.ticker.speed = 1;
-      uiManager.textEffect(uiManager.mainText, 30);
-      loginScreen.visible = false;
+      uiManager.mainScreen();
     });
     loginScreen.addChild(this.loginAsGuestBtn);
 
     // Login by facebook
     this.loginAsUserBtn = new GOWN.Button(this.theme);
-    this.loginAsUserBtn.width = 300;
-    this.loginAsUserBtn.height = 50;
+    this.loginAsUserBtn.width = 450;
+    this.loginAsUserBtn.height = 69;
+    this.loginAsUserBtn._textStyle = this.loginAsUserBtn.height / 2;
     this.loginAsUserBtn.x = app.view.width / 2 - this.loginAsUserBtn.width/2;
-    this.loginAsUserBtn.y = this.loginAsGuestBtn.y + this.loginAsGuestBtn.height + 10;
-    this.loginAsUserBtn.label = "Login by facebook";
+    this.loginAsUserBtn.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height - 150;
+    this.loginAsUserBtn.label = "";
+    let loginImg = new Sprite(Loader.resources["public/img/fblogin.png"].texture);
     this.loginAsUserBtn.visible = true;
-
+    loginImg.width = this.loginAsUserBtn.width
+    loginImg.height = this.loginAsUserBtn.height + 2
+    this.loginAsUserBtn.addChild(loginImg)
     this.loginAsUserBtn.on(GOWN.Button.TRIGGERED, function(){
       window.location.href = "/auth/facebook";
     });
     loginScreen.addChild(this.loginAsUserBtn);
 
-    // Logout facebook
+    // Logout
     this.logoutBtn = new GOWN.Button(this.theme);
-    this.logoutBtn.width = 300;
-    this.logoutBtn.height = 50;
+    this.logoutBtn.width = 450;
+    this.logoutBtn.height = 69;
     this.logoutBtn.x = app.view.width / 2 - this.logoutBtn.width/2;
     this.logoutBtn.y = this.logoutBtn.y + this.logoutBtn.height + 100;
+    this.logoutBtn._textStyle = this.logoutBtn.height / 2;
     this.logoutBtn.label = "Logout";
     this.logoutBtn.visible = false;
 
     this.logoutBtn.on(GOWN.Button.TRIGGERED, function(){
       window.location.href = "/logout";
     });
-    this.addChild(this.logoutBtn);
+    loginScreen.addChild(this.logoutBtn);
+    // Save point
+    this.saveBtn = new GOWN.Button(this.theme);
+    this.saveBtn.width = 450;
+    this.saveBtn.height = 69;
+    this.saveBtn.x = app.view.width / 2 - this.saveBtn.width/2;
+    this.saveBtn.y = this.saveBtn.y + this.saveBtn.height + 200;
+    this.saveBtn._textStyle = this.saveBtn.height / 2;
+    this.saveBtn.label = "Save current point to server";
+    this.saveBtn.visible = false;
+
+    this.saveBtn.on(GOWN.Button.TRIGGERED, function(){
+      console.log("Saving animation... Resume on done!")
+      uiManager.resume()
+    });
+    loginScreen.addChild(this.saveBtn);
+    // Replay
+    this.replayBtn = new GOWN.Button(this.theme);
+    this.replayBtn.width = 450;
+    this.replayBtn.height = 100;
+    this.replayBtn.x = app.view.width / 2 - this.replayBtn.width/2;
+    this.replayBtn.y = this.replayBtn.y + this.replayBtn.height + 100;
+    this.replayBtn._textStyle = this.replayBtn.height / 2;
+    this.replayBtn.label = "Replay";
+    this.replayBtn.visible = false;
+
+    this.replayBtn.on(GOWN.Button.TRIGGERED, function(){
+      current_user.point = 1000;
+      setUser = false;
+      uiManager.mainScreen();
+    });
+    this.addChild(this.replayBtn);
+  }
+
+  pause() {
+    this.pauseBtn.label = "RESUME";
+    app.state = pause;
+    if (!current_user)
+      this.logoutBtn.label = "To Main Menu"
+    loginScreen.visible = true
+  }
+
+  resume() {
+    app.state = play;
+    this.settingPrePlay();
+    this.pauseBtn.label = "PAUSE";
+    loginScreen.visible = false
+  }
+
+  mainScreen() {
+    uiManager.replayBtn.visible = false;
+    app.state = main;
+    app.ticker.speed = 1;
+    this.textEffect(this.mainText, 30);
+    loginScreen.visible = false;
   }
 
   waitTapScreen() {
@@ -197,6 +248,10 @@ class UIManager extends Container {
     this.coinText.visible = true;
     this.scroll_group.visible = true;
     this.pauseBtn.visible = true;
+    this.saveBtn.visible = true;
+    this.logoutBtn.visible = true;
+    this.loginAsUserBtn.visible = false;
+    this.loginAsGuestBtn.visible = false;
     this.pointer.tap = null;
     app.ticker.remove(this.textHandler);
     app.ticker.speed = 1;
@@ -208,7 +263,7 @@ class UIManager extends Container {
     this.mainText.y = app.view.height / 2 - this.mainText.height / 2;
     this.mainText.visible = true;
     if (!isGameOver)
-      Helper.wait(500).then(() => {
+      Helper.wait(300).then(() => {
         this.mainText.visible = false;
         if (onComplete !== null)
           onComplete()

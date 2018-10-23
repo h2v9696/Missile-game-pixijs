@@ -1,5 +1,4 @@
 //Observe partten
-// var current_user = null;
 const eventDispatcher = new EventDispatcher();
 //Set up Pixi and load the texture atlas files - call the `setup`
 //function when they've loaded
@@ -19,7 +18,7 @@ const addPosision = 2;
 //Game variable
 let background;
 let DELTA_TIME = 1;
-let set= false;
+let setUser = false;
 let lastTime = 0;
 let user = {
   id: 0,
@@ -39,15 +38,12 @@ Loader
         .add("public/img/enemy4.png")
         .add("public/img/missile.png")
         .add("public/img/blackbg.jpg")
+        .add("public/img/fblogin.png")
         .load(setup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
 function setup() {
-  if (current_user != null) {
-    user = current_user;
-    app.point = user.point
-    eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
-  }
+
   //Initialize the game sprites, set the game `state` to `play` and start the 'gameLoop'
   //Enemies
   enemyManager.loadTextures();
@@ -81,15 +77,13 @@ function setup() {
 }
 
 function gameLoop() {
-  //Runs the current game `state` in a loop and render the sprites
-  //Custom delta time
-  if (current_user != null && !set) {
+  if (current_user != null && !setUser) {
     user = current_user;
     app.point = user.point
     eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
-    set = true
   }
-
+  //Runs the current game `state` in a loop and render the sprites
+  //Custom delta time
   var time = Date.now();
   var currentTime =  time;
   var passedTime = currentTime - lastTime;
@@ -118,6 +112,7 @@ function play() {
 }
 
 function end() {
+  uiManager.replayBtn.visible = true;
   uiManager.showText("Game Over!!", null, true);
   //All the code that should run at the end of the game goes here
 }
