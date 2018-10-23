@@ -38,13 +38,11 @@
             //     // }
             // });
         </script>
-        <div align = "center">
-            <% if (user) {%>
-                <script>
-                    current_user = <%- JSON.stringify(user) %>
-                </script>
-            <% } %>
-        </div>
+        <% if (user) {%>
+            <script>
+                current_user = <%- JSON.stringify(user) %>
+            </script>
+        <% } %>
 
         <script src="public/js/alias.js?newversion"></script>
         <script src="public/js/helpers.js?newversion"></script>
