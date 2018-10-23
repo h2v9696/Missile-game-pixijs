@@ -31,6 +31,7 @@ class UIManager extends Container {
     this.loginAsUserBtn = null;
     this.logoutBtn = null;
     this.saveBtn = null;
+    this.replayBtn = null;
     this.theme = null;
   }
 
@@ -195,7 +196,8 @@ class UIManager extends Container {
   }
 
   mainScreen() {
-    uiManager.replayBtn.visible = false;
+    if (this.replayBtn != null)
+      this.replayBtn.visible = false;
     app.state = main;
     app.ticker.speed = 1;
     this.textEffect(this.mainText, 30);
