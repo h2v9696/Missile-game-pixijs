@@ -7,17 +7,17 @@ class Enemy {
         x: 0,
         y: 0,
         radius: 10
-      }
+      };
     this.greatPos = {
         x: 0,
         y: 0,
         radius: 40
-      }
+      };
     this.goodPos = {
         x: 0,
         y: 0,
         radius: 50
-      }
+      };
     this.pointPerfectHit = 70;
     this.pointGreatHit = 50;
     this.pointGoodHit = 10;
@@ -121,7 +121,7 @@ class Enemy {
   enemyDeath(parent, enemy/*, perfectCircle, greatCircle, goodCircle*/) {
     //Set death animation
     let explosionAnimation = new AnimatedSprite(missileFly.explosionTextures);
-    explosionAnimation.animationSpeed = 0.15
+    explosionAnimation.animationSpeed = 0.15;
     explosionAnimation.loop = false;
     explosionAnimation.visible = false;
     explosionAnimation.pivot.x = 0.5;

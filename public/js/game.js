@@ -39,6 +39,7 @@ Loader
         .add("public/img/enemy4.png")
         .add("public/img/missile.png")
         .add("public/img/blackbg.jpg")
+        .add("public/img/fblogin.png")
         .load(setup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function
