@@ -21,6 +21,13 @@ class EnemyManager extends Container {
   update() {
     this.children.some(enemy => {
       enemy.y += addPosision * DELTA_TIME; //Add equal to background so it's move along with bg
+      //If enemy pass over screen, decrease player point by 50
+      if(enemy.y > app.view.height - 120 && !enemy.isPassOver){
+        eventDispatcher.postEvent('ChangePoint', -50);
+        eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
+        enemy.isPassOver = true;
+      }
+
       //Destroy enemy when out of screen about 300px
       if (enemy.y > app.view.height + 300) {
         this.removeChild(enemy);

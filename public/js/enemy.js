@@ -58,6 +58,7 @@ class Enemy {
 
     e.interactive = true;
     e.hitArea = TransparencyHitArea.create(e);
+    e.isPassOver = false;
     // e.on("tap", function(e){ // Mobile test
     this.onTapEnemy(parent, e, this);
     parent.addChild(e);
@@ -128,6 +129,7 @@ class Enemy {
     explosionAnimation.pivot.y = 0.5;
     explosionAnimation.scale.x = 0.7;
     explosionAnimation.scale.y = 0.7;
+    explosionAnimation.isPassOver = true;
 
     let multipler = 1;
     let i = Helper.getRandomInteger(1, 100);
