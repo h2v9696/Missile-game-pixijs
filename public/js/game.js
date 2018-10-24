@@ -25,6 +25,7 @@ let user = {
   username: "Guest",
   point: 1000
 };
+//let socket = io.connect("http://localhost:3000");
 //Load texture
 Loader
         .add("public/img/bg.jpg")

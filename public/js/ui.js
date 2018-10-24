@@ -158,8 +158,12 @@ class UIManager extends Container {
     this.saveBtn.visible = false;
 
     this.saveBtn.on(GOWN.Button.TRIGGERED, function(){
+      let data = user;
+      data.point = app.point;
+
+      socket.emit("Save-point", data);
       console.log("Saving animation... Resume on done!")
-      uiManager.resume()
+      //uiManager.resume();
     });
     loginScreen.addChild(this.saveBtn);
     // Replay
