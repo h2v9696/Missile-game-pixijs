@@ -139,7 +139,7 @@ class UIManager extends Container {
     loginImg.height = this.loginAsUserBtn.height + 2
     this.loginAsUserBtn.addChild(loginImg)
     this.loginAsUserBtn.on(GOWN.Button.TRIGGERED, function(){
-      window.location.href = "/auth/facebook";
+      window.location = "http://localhost:3000/auth/facebook";
     });
     loginScreen.addChild(this.loginAsUserBtn);
     // Login by twitter
@@ -158,7 +158,7 @@ class UIManager extends Container {
 
     this.loginAsUserBtnTw.addChild(loginImgTw)
     this.loginAsUserBtnTw.on(GOWN.Button.TRIGGERED, function(){
-      window.location.href = "/auth/twitter";
+      window.location = "http://13.229.144.150/auth/twitter";
     });
     loginScreen.addChild(this.loginAsUserBtnTw);
     // Logout
@@ -172,7 +172,7 @@ class UIManager extends Container {
     this.logoutBtn.visible = false;
 
     this.logoutBtn.on(GOWN.Button.TRIGGERED, function(){
-      window.location.href = "/logout";
+      window.location = "http://localhost:3000/logout";
     });
     loginScreen.addChild(this.logoutBtn);
     // Save point
