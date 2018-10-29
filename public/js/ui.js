@@ -172,7 +172,7 @@ class UIManager extends Container {
     this.logoutBtn.visible = false;
 
     this.logoutBtn.on(GOWN.Button.TRIGGERED, function(){
-      window.location = "http://localhost:3000/logout";
+      window.location.href = "/logout";
     });
     loginScreen.addChild(this.logoutBtn);
     // Save point
