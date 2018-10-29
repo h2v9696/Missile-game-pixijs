@@ -251,7 +251,6 @@ class UIManager extends Container {
       this.mainText.text = "Tap to start!\n" + user.username;
       this.mainText.x = app.view.width / 2 - this.mainText.width / 2;
       this.mainText.y = app.view.height / 2 - this.mainText.height / 2;
-      this.mainText.visible = true;
       this.pointer.tap = () => {
           this.settingPrePlay();
           enemyManager.spawnEnemies();
