@@ -134,7 +134,7 @@ class UIManager extends Container {
     this.loginAsUserBtn.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height - 150;
     this.loginAsUserBtn.label = "";
     let loginImg = new Sprite(Loader.resources["public/img/fblogin.png"].texture);
-    this.loginAsUserBtn.visible = false;
+    this.loginAsUserBtn.visible = true;
     loginImg.width = this.loginAsUserBtn.width
     loginImg.height = this.loginAsUserBtn.height + 2
     this.loginAsUserBtn.addChild(loginImg)
@@ -192,8 +192,8 @@ class UIManager extends Container {
       data.point = app.point;
       let msg = "Saving...";
       socket.emit("Save-point", data, msg, function(backmsg){
+        console.log(backmsg);
         Helper.wait(500).then(() => {
-          console.log(backmsg);
           uiManager.saveText.text = "Saved !!!";
           Helper.wait(500).then(() => {
             uiManager.saveText.visible = false;

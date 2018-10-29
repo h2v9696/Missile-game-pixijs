@@ -48,7 +48,9 @@ exports.updatePoint = function(data, msg, callback) {
     if (profile != null) {
       User.update(data, function(profile) {
         if (profile != null)
+        {
           callback("Success update user point");
+        }
       });
     } else {
       callback(null)

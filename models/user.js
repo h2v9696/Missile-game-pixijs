@@ -13,19 +13,15 @@ exports.create = function(user, callback) {
 }
 
 exports.findByID = function(profile, callback) {
-  console.log(profile.id);
-
   connection.query('SELECT * FROM users WHERE id = ?', profile.id, function (error, results, fields) {
     if (error) {
       console.log("DB error ocurred", error);
       callback(null);
     }
     if (results.length > 0) {
-      console.log(JSON.parse(JSON.stringify(results))[0]);
-
       callback(JSON.parse(JSON.stringify(results))[0]);
-    }
-    callback(null)
+    } else
+      callback(null)
   });
 }
 
