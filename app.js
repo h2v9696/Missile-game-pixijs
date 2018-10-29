@@ -9,6 +9,7 @@ const express = require('express')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , config = require('./config/config')
+  , cors = require('cors')
   // , https = require('https')
   , fs = require('fs')
   , server = require("http").Server(app)
@@ -45,6 +46,7 @@ passport.use(new TwitterStrategy({
 app.set('views', __dirname + '/views')
 app.set('view engine', 'ejs')
 
+app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({ secret: 'sskey', key: 'sid'}));
