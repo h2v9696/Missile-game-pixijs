@@ -4,7 +4,7 @@ module.exports={
   "twitter_api_key" : "N0DgtlLekmUtN5sVfs6WERfMR",
   "twitter_api_secret" : "ixaELQCFMjy28kmL36zYZntzoydNcbe8dKiw1xz6TNmIPhk8r2",
   "callback_url"          :     "http://localhost:3000/auth/facebook/callback",
-  "twitter_callback_url"          :     "http://localhost:3000/auth/twitter/callback",
+  "twitter_callback_url"          :     "http://13.229.144.150/auth/twitter/callback",
   "use_database"          :     "true",
   "host"                  :     "localhost",
   "username"              :     "root",
