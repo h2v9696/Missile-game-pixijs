@@ -1,3 +1,7 @@
 Header set Expires "Thu, 19 Nov 1981 08:52:00 GM"
 Header set Cache-Control "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
 Header set Pragma "no-cache"
+SetEnvIf Origin "^(.*\.domain\.com)$" ORIGIN_SUB_DOMAIN=$1
+Header set Access-Control-Allow-Origin "%{ORIGIN_SUB_DOMAIN}e" env=ORIGIN_SUB_DOMAIN
+Header set Access-Control-Allow-Methods: "*"
+Header set Access-Control-Allow-Headers: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
