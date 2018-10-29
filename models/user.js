@@ -2,15 +2,41 @@
 //           , db = new sqlite3.Database('users.db')
 // // Export some model methods
 // var users = [];
-// // exports.update = exports.create = function(key, name, email, point) {
-// //     users[key] = { name: name, email: email, point: point};
-// // }
+
+const connection = require('../config/mysql_db')
 
 exports.index = function() {
-    // db.all('SELECT * FROM users', (err, rows) => {
-    //   users = rows;
-    // });
-    // return users;
+}
+
+exports.create = function(user, callback) {
+  connection.query('INSERT INTO users SET ?', user, function (error, results, fields) {
+    if (error)
+      callback(null);
+
+    callback(user);
+  });
+}
+
+exports.findByID = function(profile, callback) {
+  connection.query('SELECT * FROM users WHERE id = ?', profile.id, function (error, results, fields) {
+    if (error) {
+      console.log("DB error ocurred", error);
+      callback(null);
+    }
+    if (results.length > 0) {
+      callback(JSON.parse(JSON.stringify(results))[0]);
+    }
+  });
+}
+
+exports.update = function(profile, callback) {
+  connection.query('UPDATE users SET point = ? WHERE id = ? ', [profile.point, profile.id], function(error, results, fields){
+    if (error) {
+      console.log("Update error ocurred", error);
+      callback(null);
+    }
+    callback(profile)
+  });
 }
 
 // exports.read = function(key) {

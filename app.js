@@ -4,28 +4,18 @@ const express = require('express')
   , passport = require('passport')
   , util = require('util')
   , FacebookStrategy = require('passport-facebook').Strategy
+  , TwitterStrategy = require('passport-twitter').Strategy
   , session = require('express-session')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , config = require('./config/config')
-  , mysql = require('mysql')
-  , https = require('https')
+  , connection = require('./config/mysql_db')
+  // , https = require('https')
   , fs = require('fs')
   , server = require("http").Server(app)
   , io = require("socket.io")(server)
-var users = require('./models/user.js')
+var user_controller = require('./controllers/users.js')
 
-var connection = mysql.createConnection({
-  host : config.host,
-  user : config.username,
-  password : config.password,
-  database : config.database
-});
-//Connect to Database only if Config.js parameter is set.
-if(config.use_database==='true')
-{
-    connection.connect();
-}
 // Passport session setup.
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -41,41 +31,20 @@ passport.use(new FacebookStrategy({
     callbackURL: config.callback_url,
     profileFields: ['id', 'displayName']
   },
-  function(accessToken, refreshToken, profile, done) {
-    process.nextTick(function () {
+  user_controller.loginUser
+));
+// Use the TwitterStrategy within Passport.
 
-      connection.query('SELECT * FROM users WHERE id = ?', profile.id, function (error, results, fields) {
-        if (error) {
-          console.log("error ocurred",error);
-          return done(err);
-        }
-        // console.log('The solution is: ', results);
-        if (results.length >0) {
-          // console.log('Success!')
-
-          return done(null, JSON.parse(JSON.stringify(results))[0]);
-
-        } else {
-          user = {
-            "id": profile.id,
-            "username": profile.displayName,
-            "point": 1000
-          }
-          connection.query('INSERT INTO users SET ?', user, function (error, results, fields) {
-            if (error) {
-              console.log("error ocurred", error);
-            } else {
-              return done(null, user);
-            }
-          });
-        }
-      });
-      //Check whether the User exists or not using profile.id
-      //Further DB code.
-    });
+passport.use(new TwitterStrategy({
+    consumerKey: config.twitter_api_key,
+    consumerSecret:config.twitter_api_secret ,
+    callbackURL: config.callback_url,
+    profileFields: ['id', 'screen_name']
+  },
+  function(token, tokenSecret, profile, done) {
+    process.nextTick(user_controller.loginUser(profile));
   }
 ));
-
 app.set('views', __dirname + '/views')
 app.set('view engine', 'ejs')
 
@@ -95,37 +64,7 @@ io.on("connection", function(socket){
 
   });
 
-  socket.on("Save-point", function(data){
-    let user;
-    connection.query('SELECT * FROM users WHERE id = ?', data.id, function (error, results, fields){
-      if (error) {
-        console.log("error ocurred",error);
-        return done(err);
-      }
-      else{
-        user = JSON.parse(JSON.stringify(results))[0];
-        if(user == null)
-        {
-          console.log("####11111");
-          connection.query('INSERT INTO users SET ?', data, function (error, results, fields) {
-            if (error) {
-              console.log("error ocurred", error);
-            }
-          });
-        }
-        else
-        {
-          console.log("####22222");
-          console.log(data.point);
-          connection.query('UPDATE users SET point = ? WHERE id = ? ', [data.point, user.id], function(error, results, fields){
-            if (error) {
-              console.log("error ocurred", error);
-            }
-          }); 
-        }
-      }
-    });
-  });
+  socket.on("Save-point", user_controller.updatePoint);
 });
 
 // https.createServer({

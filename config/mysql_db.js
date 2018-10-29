@@ -1,5 +1,5 @@
 var mysql = require('mysql')
-      , config = require('./configuration/config')
+      , config = require('./config')
 
 //Define MySQL parameter in Config.js file.
 var connection = mysql.createConnection({
