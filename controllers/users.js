@@ -23,12 +23,16 @@ exports.loginUser = function(accessToken, refreshToken, profile, done) {
   });
 }
 
-exports.updatePoint = function(data) {
+exports.updatePoint = function(data, msg, callback) {
+  console.log("Message from client: " + msg);
   User.findByID(data, function(profile) {
     if (profile != null) {
       User.update(data, function(profile) {
-        console.log(profile);
+        if (profile != null)
+          callback("Success update user point");
       });
+    } else {
+      callback(null)
     }
   });
 }

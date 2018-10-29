@@ -6,6 +6,11 @@ class UIManager extends Container {
       wordWrap: true, wordWrapWidth: app.view.width,
       stroke: "white", strokeThickness: 4
     });
+    this.saveText = new Text("Saving...", {
+      fontSize: 80, align: "center",
+      wordWrap: true, wordWrapWidth: app.view.width,
+      stroke: "white", strokeThickness: 4
+    });
     this.alertText = new Text("Not enough point to unlock!", {
       fontSize: 30,
       fill: "red",
@@ -156,14 +161,29 @@ class UIManager extends Container {
     this.saveBtn._textStyle = this.saveBtn.height / 2;
     this.saveBtn.label = "Save current point to server";
     this.saveBtn.visible = false;
+    this.saveText.x = app.view.width / 2 - this.saveText.width / 2;
+    this.saveText.y = app.view.height / 2 - this.saveText.height / 2;
+    this.saveText.visible = false;
+
 
     this.saveBtn.on(GOWN.Button.TRIGGERED, function(){
+      uiManager.saveText.text = "Saving...";
+      uiManager.saveText.visible = true;
       let data = user;
       data.point = app.point;
-      socket.emit("Save-point", data);
-      console.log("Saving animation... Resume on done!")
-      //uiManager.resume();
+      let msg = "Saving...";
+      socket.emit("Save-point", data, msg, function(backmsg){
+        Helper.wait(500).then(() => {
+          console.log(backmsg);
+          uiManager.saveText.text = "Saved !!!";
+          Helper.wait(500).then(() => {
+            uiManager.saveText.visible = false;
+            uiManager.resume();
+          });
+        });
+      });
     });
+    loginScreen.addChild(this.saveText);
     loginScreen.addChild(this.saveBtn);
     // Replay
     this.replayBtn = new GOWN.Button(this.theme);

@@ -61,7 +61,7 @@ app.use(express.static('.'));
 server.listen(port);
 io.on("connection", function(socket){
   socket.on("disconnect", function(){
-
+    console.log("Disconnected");
   });
 
   socket.on("Save-point", user_controller.updatePoint);
