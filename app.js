@@ -12,7 +12,7 @@ const express = require('express')
   // , https = require('https')
   , fs = require('fs')
   , server = require("http").Server(app)
-  , io = require("socket.io")(server)
+  , io = require("socket.io").listen(server)
 var user_controller = require('./controllers/users.js')
 
 // Passport session setup.
