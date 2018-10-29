@@ -7,17 +7,17 @@ class Enemy {
         x: 0,
         y: 0,
         radius: 10
-      }
+      };
     this.greatPos = {
         x: 0,
         y: 0,
         radius: 40
-      }
+      };
     this.goodPos = {
         x: 0,
         y: 0,
         radius: 50
-      }
+      };
     this.pointPerfectHit = 70;
     this.pointGreatHit = 50;
     this.pointGoodHit = 10;
@@ -58,6 +58,7 @@ class Enemy {
 
     e.interactive = true;
     e.hitArea = TransparencyHitArea.create(e);
+    e.isPassOver = false;
     // e.on("tap", function(e){ // Mobile test
     this.onTapEnemy(parent, e, this);
     parent.addChild(e);
@@ -121,13 +122,14 @@ class Enemy {
   enemyDeath(parent, enemy/*, perfectCircle, greatCircle, goodCircle*/) {
     //Set death animation
     let explosionAnimation = new AnimatedSprite(missileFly.explosionTextures);
-    explosionAnimation.animationSpeed = 0.15
+    explosionAnimation.animationSpeed = 0.15;
     explosionAnimation.loop = false;
     explosionAnimation.visible = false;
     explosionAnimation.pivot.x = 0.5;
     explosionAnimation.pivot.y = 0.5;
     explosionAnimation.scale.x = 0.7;
     explosionAnimation.scale.y = 0.7;
+    explosionAnimation.isPassOver = true;
 
     let multipler = 1;
     let i = Helper.getRandomInteger(1, 100);

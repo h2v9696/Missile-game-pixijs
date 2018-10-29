@@ -11,6 +11,8 @@ const express = require('express')
   , mysql = require('mysql')
   , https = require('https')
   , fs = require('fs')
+  , server = require("http").Server(app)
+  , io = require("socket.io")(server)
 var users = require('./models/user.js')
 
 var connection = mysql.createConnection({
@@ -84,9 +86,48 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(require('./config/routers.js'))
 app.use(express.static('.'));
-app.listen(port, function() {
-  console.log('Listening on port ' + port)
+// app.listen(port, function() {
+//   console.log('Listening on port ' + port)
+// });
+server.listen(port);
+io.on("connection", function(socket){
+  socket.on("disconnect", function(){
+
+  });
+
+  socket.on("Save-point", function(data){
+    let user;
+    connection.query('SELECT * FROM users WHERE id = ?', data.id, function (error, results, fields){
+      if (error) {
+        console.log("error ocurred",error);
+        return done(err);
+      }
+      else{
+        user = JSON.parse(JSON.stringify(results))[0];
+        if(user == null)
+        {
+          console.log("####11111");
+          connection.query('INSERT INTO users SET ?', data, function (error, results, fields) {
+            if (error) {
+              console.log("error ocurred", error);
+            }
+          });
+        }
+        else
+        {
+          console.log("####22222");
+          console.log(data.point);
+          connection.query('UPDATE users SET point = ? WHERE id = ? ', [data.point, user.id], function(error, results, fields){
+            if (error) {
+              console.log("error ocurred", error);
+            }
+          }); 
+        }
+      }
+    });
+  });
 });
+
 // https.createServer({
 //   key: fs.readFileSync('server.key'),
 //   cert: fs.readFileSync('server.cert')
