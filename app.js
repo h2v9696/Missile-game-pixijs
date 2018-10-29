@@ -92,21 +92,21 @@ app.use(express.static('.'));
 server.listen(port);
 io.on("connection", function(socket){
   socket.on("disconnect", function(){
-
+    console.log("Disconnected");
   });
 
-  socket.on("Save-point", function(data){
+  socket.on("Save-point", function(data, msg, callback){
+    console.log("Message from client: " + msg);
     let user;
     connection.query('SELECT * FROM users WHERE id = ?', data.id, function (error, results, fields){
       if (error) {
-        console.log("error ocurred",error);
+        callback(error);
         return done(err);
       }
       else{
         user = JSON.parse(JSON.stringify(results))[0];
         if(user == null)
         {
-          console.log("####11111");
           connection.query('INSERT INTO users SET ?', data, function (error, results, fields) {
             if (error) {
               console.log("error ocurred", error);
@@ -115,12 +115,11 @@ io.on("connection", function(socket){
         }
         else
         {
-          console.log("####22222");
-          console.log(data.point);
           connection.query('UPDATE users SET point = ? WHERE id = ? ', [data.point, user.id], function(error, results, fields){
             if (error) {
               console.log("error ocurred", error);
             }
+            callback("Success update user point");
           }); 
         }
       }
