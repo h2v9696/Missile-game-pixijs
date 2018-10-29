@@ -113,7 +113,7 @@ class UIManager extends Container {
     // Login as guest
     this.loginAsGuestBtn = new GOWN.Button(this.theme);
     this.loginAsGuestBtn.width = 450;
-    this.loginAsGuestBtn.height = 69;
+    this.loginAsGuestBtn.height = 90;
     this.loginAsGuestBtn._textStyle = this.loginAsGuestBtn.height / 2;
     this.loginAsGuestBtn.x = app.view.width / 2 - this.loginAsGuestBtn.width / 2;
     this.loginAsGuestBtn.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height - 250;
@@ -134,7 +134,7 @@ class UIManager extends Container {
     this.loginAsUserBtn.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height - 150;
     this.loginAsUserBtn.label = "";
     let loginImg = new Sprite(Loader.resources["public/img/fblogin.png"].texture);
-    this.loginAsUserBtn.visible = true;
+    this.loginAsUserBtn.visible = false;
     loginImg.width = this.loginAsUserBtn.width
     loginImg.height = this.loginAsUserBtn.height + 2
     this.loginAsUserBtn.addChild(loginImg)
@@ -152,8 +152,10 @@ class UIManager extends Container {
     this.loginAsUserBtnTw.label = "";
     let loginImgTw = new Sprite(Loader.resources["public/img/twitter-login.png"].texture);
     this.loginAsUserBtnTw.visible = true;
+    loginImgTw.y = -9
     loginImgTw.width = this.loginAsUserBtnTw.width
-    loginImgTw.height = this.loginAsUserBtnTw.height + 2
+    loginImgTw.height = this.loginAsUserBtnTw.height + 21
+
     this.loginAsUserBtnTw.addChild(loginImgTw)
     this.loginAsUserBtnTw.on(GOWN.Button.TRIGGERED, function(){
       window.location.href = "/auth/twitter";
@@ -247,6 +249,9 @@ class UIManager extends Container {
   waitTapScreen() {
     if (!this.isLoading) {
       this.mainText.text = "Tap to start!\n" + user.username;
+      this.mainText.x = app.view.width / 2 - this.mainText.width / 2;
+      this.mainText.y = app.view.height / 2 - this.mainText.height / 2;
+      this.mainText.visible = true;
       this.pointer.tap = () => {
           this.settingPrePlay();
           enemyManager.spawnEnemies();
@@ -301,7 +306,6 @@ class UIManager extends Container {
   }
 
   showText(text, onComplete = null, isGameOver = false) {
-    this.mainText.visible = true;
     this.mainText.text = text;
     this.mainText.x = app.view.width / 2 - this.mainText.width / 2;
     this.mainText.y = app.view.height / 2 - this.mainText.height / 2;

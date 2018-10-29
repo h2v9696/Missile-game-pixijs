@@ -24,10 +24,7 @@ exports.loginUser = function(accessToken, refreshToken, profile, done) {
 }
 
 exports.loginUserTw = function(token, tokenSecret, profile, done) {
-  console.log(profile);
   User.findByID(profile, function(data) {
-  console.log(data);
-
     if (data != null) {
       return done(null, data);
     } else {
