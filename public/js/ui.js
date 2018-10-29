@@ -34,6 +34,7 @@ class UIManager extends Container {
     this.pauseBtn = null;
     this.loginAsGuestBtn = null;
     this.loginAsUserBtn = null;
+    this.loginAsUserBtnTw = null;
     this.logoutBtn = null;
     this.saveBtn = null;
     this.replayBtn = null;
@@ -61,13 +62,17 @@ class UIManager extends Container {
     this.coinText.y = 0;
     this.alertText.x = app.view.width / 2 - this.alertText.width / 2;
     this.alertText.y = this.coinText.height + 5;
+    this.saveText.x = app.view.width / 2 - this.saveText.width / 2;
+    this.saveText.y = app.view.height / 2 - this.saveText.height / 2;
+
     this.coinText.text = "Point: " + app.point;
     this.coinText.visible = false;
     this.addChild(this.mainText);
     this.addChild(this.coinText);
     this.addChild(this.alertText);
-    this.mainText.visible = true;
+    this.mainText.visible = false;
     this.alertText.visible = false;
+    this.saveText.visible = false;
   }
 
   setupScrollBG() {
@@ -137,7 +142,23 @@ class UIManager extends Container {
       window.location.href = "/auth/facebook";
     });
     loginScreen.addChild(this.loginAsUserBtn);
-
+    // Login by twitter
+    this.loginAsUserBtnTw = new GOWN.Button(this.theme);
+    this.loginAsUserBtnTw.width = 450;
+    this.loginAsUserBtnTw.height = 69;
+    this.loginAsUserBtnTw._textStyle = this.loginAsUserBtnTw.height / 2;
+    this.loginAsUserBtnTw.x = app.view.width / 2 - this.loginAsUserBtnTw.width/2;
+    this.loginAsUserBtnTw.y = app.view.height / 2 - this.mainText.height / 2 + this.loginAsGuestBtn.height - 50;
+    this.loginAsUserBtnTw.label = "";
+    let loginImgTw = new Sprite(Loader.resources["public/img/twitter-login.png"].texture);
+    this.loginAsUserBtnTw.visible = true;
+    loginImgTw.width = this.loginAsUserBtnTw.width
+    loginImgTw.height = this.loginAsUserBtnTw.height + 2
+    this.loginAsUserBtnTw.addChild(loginImgTw)
+    this.loginAsUserBtnTw.on(GOWN.Button.TRIGGERED, function(){
+      window.location.href = "/auth/twitter";
+    });
+    loginScreen.addChild(this.loginAsUserBtnTw);
     // Logout
     this.logoutBtn = new GOWN.Button(this.theme);
     this.logoutBtn.width = 450;
@@ -161,10 +182,6 @@ class UIManager extends Container {
     this.saveBtn._textStyle = this.saveBtn.height / 2;
     this.saveBtn.label = "Save current point to server";
     this.saveBtn.visible = false;
-    this.saveText.x = app.view.width / 2 - this.saveText.width / 2;
-    this.saveText.y = app.view.height / 2 - this.saveText.height / 2;
-    this.saveText.visible = false;
-
 
     this.saveBtn.on(GOWN.Button.TRIGGERED, function(){
       uiManager.saveText.text = "Saving...";
@@ -276,6 +293,7 @@ class UIManager extends Container {
     this.saveBtn.visible = true;
     this.logoutBtn.visible = true;
     this.loginAsUserBtn.visible = false;
+    this.loginAsUserBtnTw.visible = false;
     this.loginAsGuestBtn.visible = false;
     this.pointer.tap = null;
     app.ticker.remove(this.textHandler);
@@ -283,6 +301,7 @@ class UIManager extends Container {
   }
 
   showText(text, onComplete = null, isGameOver = false) {
+    this.mainText.visible = true;
     this.mainText.text = text;
     this.mainText.x = app.view.width / 2 - this.mainText.width / 2;
     this.mainText.y = app.view.height / 2 - this.mainText.height / 2;

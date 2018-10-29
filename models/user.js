@@ -1,8 +1,3 @@
-// const sqlite3 = require('sqlite3')
-//           , db = new sqlite3.Database('users.db')
-// // Export some model methods
-// var users = [];
-
 const connection = require('../config/mysql_db')
 
 exports.index = function() {
@@ -18,14 +13,19 @@ exports.create = function(user, callback) {
 }
 
 exports.findByID = function(profile, callback) {
+  console.log(profile.id);
+
   connection.query('SELECT * FROM users WHERE id = ?', profile.id, function (error, results, fields) {
     if (error) {
       console.log("DB error ocurred", error);
       callback(null);
     }
     if (results.length > 0) {
+      console.log(JSON.parse(JSON.stringify(results))[0]);
+
       callback(JSON.parse(JSON.stringify(results))[0]);
     }
+    callback(null)
   });
 }
 
@@ -38,12 +38,3 @@ exports.update = function(profile, callback) {
     callback(profile)
   });
 }
-
-// exports.read = function(key) {
-//     return users[key];
-// }
-
-// exports.destroy = function(key) {
-//     delete users[key];
-// }
-

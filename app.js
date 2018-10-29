@@ -9,7 +9,6 @@ const express = require('express')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , config = require('./config/config')
-  , connection = require('./config/mysql_db')
   // , https = require('https')
   , fs = require('fs')
   , server = require("http").Server(app)
@@ -38,19 +37,17 @@ passport.use(new FacebookStrategy({
 passport.use(new TwitterStrategy({
     consumerKey: config.twitter_api_key,
     consumerSecret:config.twitter_api_secret ,
-    callbackURL: config.callback_url,
-    profileFields: ['id', 'screen_name']
+    callbackURL: config.twitter_callback_url,
+    profileFields: ['id', 'displayName']
   },
-  function(token, tokenSecret, profile, done) {
-    process.nextTick(user_controller.loginUser(profile));
-  }
+  user_controller.loginUserTw
 ));
 app.set('views', __dirname + '/views')
 app.set('view engine', 'ejs')
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({ secret: 'keyboard cat', key: 'sid'}));
+app.use(session({ secret: 'sskey', key: 'sid'}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(require('./config/routers.js'))

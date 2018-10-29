@@ -40,6 +40,7 @@ Loader
         .add("public/img/missile.png")
         .add("public/img/blackbg.jpg")
         .add("public/img/fblogin.png")
+        .add("public/img/twitter-login.png")
         .load(setup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declare any variables used in more than one function

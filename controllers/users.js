@@ -23,6 +23,28 @@ exports.loginUser = function(accessToken, refreshToken, profile, done) {
   });
 }
 
+exports.loginUserTw = function(token, tokenSecret, profile, done) {
+  console.log(profile);
+  User.findByID(profile, function(data) {
+  console.log(data);
+
+    if (data != null) {
+      return done(null, data);
+    } else {
+      user = {
+        "id": profile.id,
+        "username": profile.displayName,
+        "point": 1000
+      }
+      User.create(user, function(data) {
+        if (data != null) {
+          return done(null, data);
+        }
+      })
+    }
+  });
+}
+
 exports.updatePoint = function(data, msg, callback) {
   console.log("Message from client: " + msg);
   User.findByID(data, function(profile) {
