@@ -12,7 +12,8 @@ exports.loginUser = function(accessToken, refreshToken, profile, done) {
       user = {
         "id": profile.id,
         "username": profile.displayName,
-        "point": 1000
+        "point": 1000,
+        "highScore": 1000
       }
       User.create(user, function(data) {
         if (data != null) {
@@ -31,7 +32,8 @@ exports.loginUserTw = function(token, tokenSecret, profile, done) {
       user = {
         "id": profile.id,
         "username": profile.displayName,
-        "point": 1000
+        "point": 1000,
+        "highScore": 1000
       }
       User.create(user, function(data) {
         if (data != null) {
@@ -49,7 +51,9 @@ exports.updatePoint = function(data, msg, callback) {
       User.update(data, function(profile) {
         if (profile != null)
         {
-          callback("Success update user point");
+          User.updateHighScore(profile, function(profile) {
+            callback("Success update user point");
+          });
         }
       });
     } else {

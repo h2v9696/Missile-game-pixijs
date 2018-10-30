@@ -172,7 +172,12 @@ class UIManager extends Container {
     this.logoutBtn.visible = false;
 
     this.logoutBtn.on(GOWN.Button.TRIGGERED, function(){
-      window.location.href = "/logout";
+      if (!current_user)
+        window.location.href = "/logout";
+      else
+        uiManager.savePoint(function() {
+          window.location.href = "/logout";
+        });
     });
     loginScreen.addChild(this.logoutBtn);
     // Save point
@@ -182,25 +187,13 @@ class UIManager extends Container {
     this.saveBtn.x = app.view.width / 2 - this.saveBtn.width/2;
     this.saveBtn.y = this.saveBtn.y + this.saveBtn.height + 200;
     this.saveBtn._textStyle = this.saveBtn.height / 2;
-    this.saveBtn.label = "Save current point to server";
+    this.saveBtn.label = "Save current level";
     this.saveBtn.visible = false;
 
-    this.saveBtn.on(GOWN.Button.TRIGGERED, function(){
-      uiManager.saveText.text = "Saving...";
-      uiManager.saveText.visible = true;
-      let data = user;
-      data.point = app.point;
-      let msg = "Saving...";
-      socket.emit("Save-point", data, msg, function(backmsg){
-        console.log(backmsg);
-        Helper.wait(500).then(() => {
-          uiManager.saveText.text = "Saved !!!";
-          Helper.wait(500).then(() => {
-            uiManager.saveText.visible = false;
-            uiManager.resume();
-          });
-        });
-      });
+    this.saveBtn.on(GOWN.Button.TRIGGERED, function() {
+      uiManager.savePoint(function() {
+        uiManager.resume();
+      })
     });
     loginScreen.addChild(this.saveText);
     loginScreen.addChild(this.saveBtn);
@@ -211,13 +204,16 @@ class UIManager extends Container {
     this.replayBtn.x = app.view.width / 2 - this.replayBtn.width/2;
     this.replayBtn.y = this.replayBtn.y + this.replayBtn.height + 100;
     this.replayBtn._textStyle = this.replayBtn.height / 2;
-    this.replayBtn.label = "Continue? 10$ for 1000 point";
+    this.replayBtn.label = "Continue? +1000 point";
     this.replayBtn.visible = false;
 
     this.replayBtn.on(GOWN.Button.TRIGGERED, function(){
-      user.point = 1000;
+      app.replay = true;
+      app.point = 1000;
       setUser = false;
-      uiManager.mainScreen();
+      uiManager.savePoint(function() {
+        uiManager.mainScreen();
+      });
     });
     this.addChild(this.replayBtn);
   }
@@ -225,8 +221,10 @@ class UIManager extends Container {
   pause() {
     this.pauseBtn.label = "RESUME";
     app.state = pause;
-    if (!current_user)
+    if (!current_user) {
       this.logoutBtn.label = "To Main Menu"
+      this.saveBtn.visible = false;
+    }
     loginScreen.visible = true
   }
 
@@ -253,7 +251,8 @@ class UIManager extends Container {
       this.mainText.y = app.view.height / 2 - this.mainText.height / 2;
       this.pointer.tap = () => {
           this.settingPrePlay();
-          enemyManager.spawnEnemies();
+          if (!app.replay)
+            enemyManager.spawnEnemies();
           app.state = play;
       }
     } else this.mainText.text = "Loading...";
@@ -304,13 +303,32 @@ class UIManager extends Container {
     app.ticker.speed = 1;
   }
 
-  showText(text, onComplete = null, isGameOver = false) {
+  savePoint(callback) {
+    this.saveText.text = "Saving...";
+    this.saveText.visible = true;
+    let data = user;
+    data.point = app.point;
+    data.highScore = app.highScore;
+    let msg = "Saving...";
+    socket.emit("Save-point", data, msg, function(backmsg){
+      console.log(backmsg);
+      Helper.wait(500).then(() => {
+        uiManager.saveText.text = "Saved !!!";
+        Helper.wait(500).then(() => {
+          uiManager.saveText.visible = false;
+          callback();
+        });
+      });
+    });
+  }
+
+  showText(text, onComplete = null, isGameOver = false, showTime = 300) {
     this.mainText.text = text;
     this.mainText.x = app.view.width / 2 - this.mainText.width / 2;
     this.mainText.y = app.view.height / 2 - this.mainText.height / 2;
     this.mainText.visible = true;
     if (!isGameOver)
-      Helper.wait(300).then(() => {
+      Helper.wait(showTime).then(() => {
         this.mainText.visible = false;
         if (onComplete !== null)
           onComplete()

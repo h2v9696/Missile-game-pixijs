@@ -9,6 +9,7 @@ class Missile {
     this.missileText = new Text("" + this.pointNeededToUnlock + "P", {fontSize: 30, fill: "white"});
     this.locker = null;
     this.pointPerShootText = null;
+    this.pointEarnMultiple = this.mId > 1 ? Math.floor(this.pointPerShoot / 10) : 1;
   }
 
   render(parent) {
@@ -64,7 +65,6 @@ class Missile {
       if (missile.isLocked) {
         if (missile.pointNeededToUnlock < app.point) {
           eventDispatcher.postEvent('ChangePoint', -missile.pointNeededToUnlock);
-          eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
 
           missile.isLocked = false;
           missile.locker.visible = false;

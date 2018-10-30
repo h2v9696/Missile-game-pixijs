@@ -34,3 +34,13 @@ exports.update = function(profile, callback) {
     callback(profile)
   });
 }
+
+exports.updateHighScore = function(profile, callback) {
+  connection.query('UPDATE users SET highScore = ? WHERE id = ? ', [profile.highScore, profile.id], function(error, results, fields){
+    if (error) {
+      console.log("Update error ocurred", error);
+      callback(null);
+    }
+    callback(profile)
+  });
+}

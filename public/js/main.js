@@ -9,9 +9,28 @@ class MainScene extends PIXI.Application {
     this.isClicked = false;
     this.state = null;
     this.countTap = 0;
+    this.replay = false;
+    this.currentLevel = 1;
+    this.highScore = this.point;
 
     let changePoint = function(amount) {
       app.point += amount;
+      if (app.point < 0) app.point = 0;
+      if (app.point > app.highScore) app.highScore = app.point;
+      eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
+      if (Math.floor(app.point / 1000) > app.currentLevel) {
+        uiManager.showText("Speed up!!")
+        speed *= 1.5;
+        app.currentLevel++;
+      }
+      // } else if (Math.floor(app.point / 1000) < app.currentLevel) {
+      //   if (speed > 2) {
+      //     uiManager.showText("Speed down~")
+      //     speed /= 1.5;
+      //   }
+      //   else speed = 2;
+      //   app.currentLevel =  app.currentLevel <= 1 ? 1 : app.currentLevel-1;
+      // }
     }
 
     eventDispatcher.registerListeners('ChangePoint', changePoint);

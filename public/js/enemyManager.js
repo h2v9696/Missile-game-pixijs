@@ -7,6 +7,7 @@ class EnemyManager extends Container {
     // this.enemyMaxHealth = 5;
     this.spawnHandler = null;
     this.timeWaitSpawnEnemy = 120;
+    this.pointLost = 50;
   }
 
   loadTextures() {
@@ -20,11 +21,16 @@ class EnemyManager extends Container {
 
   update() {
     this.children.some(enemy => {
-      enemy.y += addPosision * DELTA_TIME; //Add equal to background so it's move along with bg
+      enemy.y += speed * DELTA_TIME; //Add equal to background so it's move along with bg
       //If enemy pass over screen, decrease player point by 50
       if(enemy.y > app.view.height - 120 && !enemy.isPassOver){
-        eventDispatcher.postEvent('ChangePoint', -50);
-        eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
+        eventDispatcher.postEvent('ChangeCoinText', "Point: " + (app.point - enemyManager.pointLost * app.currentMissile.pointEarnMultiple));
+
+        uiManager.showText("Enemy escape!!\nPoint -"
+         + enemyManager.pointLost * app.currentMissile.pointEarnMultiple,
+          function() {
+            eventDispatcher.postEvent('ChangePoint', -enemyManager.pointLost  * app.currentMissile.pointEarnMultiple);
+          }, false, 500);
         enemy.isPassOver = true;
       }
 

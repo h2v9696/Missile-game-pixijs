@@ -34,7 +34,6 @@ class MissileFlyEffect {
     let checkOutOfPoint = (app.point >= app.currentMissile.pointPerShoot);
     if (checkOutOfPoint) {
       eventDispatcher.postEvent('ChangePoint', -app.currentMissile.pointPerShoot);
-      eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
       //Stop scroll
       app.state = pause;
       this.missileSprite.visible = true;
@@ -45,7 +44,7 @@ class MissileFlyEffect {
       app.ticker.add(this.missileFlyHandler = function(delta) {
         // let fireSpotY = getRandomInteger(e.y + 10, e.y + e.height - 10);
         if (missileFly.missileSprite.y > posY)
-          missileFly.missileSprite.y -= addPosision * 8 * DELTA_TIME;
+          missileFly.missileSprite.y -= 16 * DELTA_TIME;
         else {
           app.ticker.remove(missileFly.missileFlyHandler);
           missileFly.missileHit.x = missileFly.missileSprite.x - missileFly.missileHit.width / 2;

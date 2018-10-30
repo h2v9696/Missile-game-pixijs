@@ -13,17 +13,18 @@ const enemyManager = new EnemyManager();
 const missileFly = new MissileFlyEffect();
 const uiManager = new UIManager();
 const loginScreen = new LoginScreen();
-const addPosision = 2;
 //Main
 //Game variable
 let background;
 let DELTA_TIME = 1;
 let setUser = false;
 let lastTime = 0;
+let speed = 2;
 let user = {
   id: 0,
   username: "Guest",
-  point: 1000
+  point: 1000,
+  highScore: 0
 };
 //let socket = io.connect("http://localhost:3000");
 //Load texture
@@ -79,10 +80,13 @@ function gameLoop() {
   if (!setUser) {
     if (current_user != null)
       user = current_user;
-    app.point = user.point
+    app.point = user.point;
+    app.highScore = user.highScore;
+    app.currentLevel = 1;
     eventDispatcher.postEvent('ChangeCoinText', "Point: " + app.point);
     setUser = true;
   }
+
   //Runs the current game `state` in a loop and render the sprites
   //Custom delta time
   var time = Date.now();
@@ -113,6 +117,8 @@ function play() {
 }
 
 function end() {
+  app.ticker.speed = 0;
+  uiManager.pauseBtn.visible = false;
   uiManager.replayBtn.visible = true;
   uiManager.showText("Game Over!!", null, true);
   //All the code that should run at the end of the game goes here

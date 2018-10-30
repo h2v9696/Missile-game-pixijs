@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 16, 2018 at 02:57 PM
+-- Generation Time: Oct 30, 2018 at 11:12 AM
 -- Server version: 5.7.23
 -- PHP Version: 5.5.9-1ubuntu4.26
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `missile-game`
+-- Database: `missile_game`
 --
 
 -- --------------------------------------------------------
@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id` varchar(255) NOT NULL,
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `point` int(11) unsigned DEFAULT NULL,
+  `highScore` int(10) unsigned NOT NULL DEFAULT '1000',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -37,8 +38,9 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `point`) VALUES
-('1545050062262544', 'Hoàng Việt', 5000);
+INSERT INTO `users` (`id`, `username`, `point`, `highScore`) VALUES
+('1545050062262544', 'Hoàng Việt', 2131, 0),
+('837101510823587840', 'Hoàng Quốc Việt', 999, 0);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

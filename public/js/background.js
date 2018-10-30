@@ -11,7 +11,7 @@ class Background extends TilingSprite {
   }
 
   update() {
-    this.tilePosition.y += addPosision * DELTA_TIME;
+    this.tilePosition.y += speed * DELTA_TIME;
     this.tilePosition.y %= this.texture.orig.height;
   }
 
