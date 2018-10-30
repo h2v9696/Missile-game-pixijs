@@ -212,7 +212,7 @@ class UIManager extends Container {
       app.point = 1000;
       app.currentLevel = 1;
       app.speed = 2;
-      app.ticker.currentTickerSpeed = 1;
+      app.currentTickerSpeed = 1;
       setUser = false;
       uiManager.savePoint(function() {
         uiManager.mainScreen();
