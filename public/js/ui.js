@@ -210,6 +210,9 @@ class UIManager extends Container {
     this.replayBtn.on(GOWN.Button.TRIGGERED, function(){
       app.replay = true;
       app.point = 1000;
+      app.currentLevel = 1;
+      app.speed = 2;
+      app.ticker.currentTickerSpeed = 1;
       setUser = false;
       uiManager.savePoint(function() {
         uiManager.mainScreen();
@@ -239,7 +242,7 @@ class UIManager extends Container {
     if (this.replayBtn != null)
       this.replayBtn.visible = false;
     app.state = main;
-    app.ticker.speed = 1;
+    app.ticker.speed = app.currentTickerSpeed;
     this.textEffect(this.mainText, 30);
     loginScreen.visible = false;
   }
@@ -300,7 +303,7 @@ class UIManager extends Container {
     this.loginAsGuestBtn.visible = false;
     this.pointer.tap = null;
     app.ticker.remove(this.textHandler);
-    app.ticker.speed = 1;
+    app.ticker.speed = app.currentTickerSpeed;
   }
 
   savePoint(callback) {

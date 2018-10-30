@@ -12,6 +12,7 @@ class MainScene extends PIXI.Application {
     this.replay = false;
     this.currentLevel = 1;
     this.highScore = this.point;
+    this.currentTickerSpeed = 1;
 
     let changePoint = function(amount) {
       app.point += amount;
@@ -21,6 +22,7 @@ class MainScene extends PIXI.Application {
       if (Math.floor(app.point / 1000) > app.currentLevel) {
         uiManager.showText("Speed up!!")
         speed *= 1.5;
+        app.currentTickerSpeed += 1;
         app.currentLevel++;
       }
       // } else if (Math.floor(app.point / 1000) < app.currentLevel) {
@@ -58,7 +60,7 @@ class MainScene extends PIXI.Application {
     this.timer = 0;
     this.ticker.remove(this.tapHandler);
     this.countTap = 0;
-    app.ticker.speed = 1;
+    app.ticker.speed = app.currentTickerSpeed;
     // app.ticker.remove(missileFlyHandler);
   }
 }
