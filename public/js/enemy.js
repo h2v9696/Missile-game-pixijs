@@ -134,7 +134,7 @@ class Enemy {
     let multipler = 1;
     let i = Helper.getRandomInteger(1, 100);
     let newText = uiManager.hitEnemyResultText + "+"
-     + (enemy.score + currentMissile.pointPerShoot)
+     + (enemy.score + app.currentMissile.pointPerShoot)
      * app.currentMissile.pointEarnMultiple;
 
     if (i < 2)
@@ -146,10 +146,10 @@ class Enemy {
     }
     if (multipler > 1)
       newText += "\nScore x " + multipler + "!!";
-    eventDispatcher.postEvent('ChangeCoinText', "Point: " + (app.point + enemy.score * multipler * app.currentMissile.pointEarnMultiple));
+    eventDispatcher.postEvent('ChangeCoinText', "Point: " + (app.point + (enemy.score + app.currentMissile.pointPerShoot) * multipler * app.currentMissile.pointEarnMultiple));
     uiManager.showText(newText, function() {
       eventDispatcher.postEvent('ChangePoint'
-      , (enemy.score + currentMissile.pointPerShoot) * multipler * app.currentMissile.pointEarnMultiple);
+      , (enemy.score + app.currentMissile.pointPerShoot) * multipler * app.currentMissile.pointEarnMultiple);
     });
     // enemies.removeChild(perfectCircle);
     // enemies.removeChild(greatCircle);
