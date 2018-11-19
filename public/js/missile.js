@@ -60,7 +60,8 @@ class Missile {
   onTapMissile(sprite, missile) {
     sprite.on("pointertap", function(event){
       var horizontalMoved = Math.abs(event.data.global.x - uiManager.scroll_group._startTouch.x);
-      if (horizontalMoved > 30) return;
+      console.log(horizontalMoved);
+      if (horizontalMoved > 100) return;
       // if (app.currentMissile.damage === this.damage) return;
       if (missile.isLocked) {
         if (missile.pointNeededToUnlock < app.point) {
