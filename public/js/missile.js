@@ -36,6 +36,21 @@ class Missile {
     m.interactive = true;
     m.height = uiManager.scroll_group.height - this.missileText.height;
     m.width = 150;
+    switch (this.mId) {
+      case 1:
+        break;
+      case 2:
+        m.tint = 0x0056e2;
+        break;
+      case 3:
+        m.tint = 0x06aa03;
+        break;
+      case 4:
+        m.tint = 0xff0000;
+        break;
+      default:
+        break;
+    }
     this.missileText.x = m.x + m.width / 2 - this.missileText.width / 2;
     this.missileText.y = uiManager.scroll_group.height - this.missileText.height;
     this.locker.scale.x = 2;
@@ -60,7 +75,6 @@ class Missile {
   onTapMissile(sprite, missile) {
     sprite.on("pointertap", function(event){
       var horizontalMoved = Math.abs(event.data.global.x - uiManager.scroll_group._startTouch.x);
-      console.log(horizontalMoved);
       if (horizontalMoved > 100) return;
       // if (app.currentMissile.damage === this.damage) return;
       if (missile.isLocked) {
@@ -77,6 +91,7 @@ class Missile {
           uiManager.showAlert("Not enough point to unlock!");
         }
       } else {
+        missileFly.changeMissileTexture(missile.mId);
         app.currentMissile.missileText.visible = false;
         app.currentMissile = missile;
         app.currentMissile.missileText.text = "Selected";

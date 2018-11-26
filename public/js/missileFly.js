@@ -4,11 +4,21 @@ class MissileFlyEffect {
     this.missileSprite = null;
     this.missileHit = false;
     this.isMissileFlying = false;
+    this.missileTextures = null;
   }
 
   render(parent) {
     //Create fly missile
-    this.missileSprite = new Sprite(Loader.resources["public/img/missile.png"].texture);
+    this.missileTextures = [
+      Loader.resources["public/img/missile.png"].texture,
+      Loader.resources["public/img/missile_blue.png"].texture,
+      Loader.resources["public/img/missile_green.png"].texture,
+      Loader.resources["public/img/missile_red.png"].texture
+    ];
+    if (app.currentMissile != null && app.currentMissile.mId <= 4)
+      this.missileSprite = new Sprite(missileFly.missileTextures[app.currentMissile.mId - 1]);
+    else
+      this.missileSprite = new Sprite(missileFly.missileTextures[0]);
     this.missileSprite.y = app.view.height - 100;
     this.missileSprite.x = 0;
     this.missileSprite.width = 23.6;
@@ -22,12 +32,22 @@ class MissileFlyEffect {
     parent.addChild(this.missileHit);
   }
 
-  loadExplosionTextures() {
+  loadTextures() {
     this.explosionTextures = [
       Loader.resources["public/img/explosion1.png"].texture,
       Loader.resources["public/img/explosion2.png"].texture,
       Loader.resources["public/img/explosion3.png"].texture,
     ];
+    this.missileTextures = [
+      Loader.resources["public/img/missile.png"].texture,
+      Loader.resources["public/img/missile_blue.png"].texture,
+      Loader.resources["public/img/missile_green.png"].texture,
+      Loader.resources["public/img/missile_red.png"].texture
+    ];
+  }
+
+  changeMissileTexture(missileId) {
+    this.missileSprite.texture = missileFly.missileTextures[missileId - 1];
   }
 
   shootMissile(callback, posX, posY) {

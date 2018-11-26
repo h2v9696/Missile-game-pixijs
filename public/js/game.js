@@ -39,6 +39,9 @@ Loader
         .add("public/img/enemy3.png")
         .add("public/img/enemy4.png")
         .add("public/img/missile.png")
+        .add("public/img/missile_red.png")
+        .add("public/img/missile_blue.png")
+        .add("public/img/missile_green.png")
         .add("public/img/blackbg.jpg")
         .add("public/img/fblogin.png")
         .add("public/img/twitter-login.png")
@@ -56,7 +59,7 @@ function setup() {
   loginScreen.render();
   app.stage.addChild(background);
   //Create explosion animation
-  missileFly.loadExplosionTextures();
+  missileFly.loadTextures();
   //Add enemyManager
   app.stage.addChild(enemyManager);
   //Create fly missile
